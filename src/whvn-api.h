@@ -10,8 +10,9 @@
 
 #if defined(WHVN_API_V1)
 typedef struct WhvnApi {
-    Str apikey;
+    Str key;
     VStr responses;
+    bool print_response;
     struct {
         CURL *handle;
         bool initialized;
