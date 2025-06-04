@@ -22,7 +22,9 @@ Str whvn_api_curl_do(WhvnApi *api, Str url) {
     //printf("WRITEBACK:%p\n", it);
     curl_easy_setopt(api->curl.handle, CURLOPT_WRITEDATA, it);
     curl_easy_setopt(api->curl.handle, CURLOPT_URL, url.str);
-    //printf("CURL-URL:%.*s\n", STR_F(url));
+    if(api->print_url) {
+        printf("%.*s\n", STR_F(url));
+    }
     CURLcode res = curl_easy_perform(api->curl.handle);
     if(res != CURLE_OK) THROW("could not perform curl: %u", res);
     if(api->print_response) {

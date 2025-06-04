@@ -12,6 +12,7 @@
 typedef struct WhvnApi {
     Str key;
     VStr responses;
+    bool print_url;
     bool print_response;
     struct {
         CURL *handle;

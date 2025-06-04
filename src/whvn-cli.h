@@ -12,6 +12,7 @@ typedef struct WhvnCli {
         Str wallpaper_info;
         Str search;
         Str tag_info;
+        Str user_collection;
     } query;
     struct {
         WhvnWallpaperInfo wallpaper_info;
