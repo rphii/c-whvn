@@ -10,4 +10,5 @@ src/build
 *.cache
 *.*_old
 *.out
+apikey
 
