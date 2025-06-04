@@ -35,10 +35,12 @@ int main(int argc, const char **argv) {
     struct ArgXGroup *g = 0;
     x=argx_init(arg_opt(arg), 'h', str("help"), str("display this help"));
       argx_help(x, arg);
-    x=argx_init(arg_opt(arg), 'R', str("print-response"), str("print the raw API response"));
-      argx_bool(x, &cli.api.print_response, 0);
-    x=argx_init(arg_opt(arg), 'U', str("print-url"), str("print the raw API URL"));
-      argx_bool(x, &cli.api.print_url, 0);
+    x=argx_init(arg_opt(arg), 'p', str("print"), str("print the raw API response"));
+      g=argx_flag(x);
+        x=argx_init(g, 0, str("url"), str("print the raw API URL"));
+          argx_flag_set(x, &cli.api.print_url, 0);
+        x=argx_init(g, 0, str("response"), str("print the raw API response"));
+          argx_flag_set(x, &cli.api.print_response, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
