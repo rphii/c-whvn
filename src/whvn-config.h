@@ -3,6 +3,7 @@
 #include <rphii/err.h>
 
 typedef struct Whvn Whvn;
+
 typedef struct WhvnConfig {
 } WhvnConfig;
 
