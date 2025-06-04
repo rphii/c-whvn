@@ -57,12 +57,12 @@ int main(int argc, const char **argv) {
     argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), &cli.api.key, 0, true);
 
     bool quit_early = false;
-    TRYC(whvn_arg_parse(cli.arg, argc, argv, &quit_early));
+    TRYC(arg_parse(arg, argc, argv, &quit_early));
 
 clean:
     whvn_collection_free(&cli.result.search);
     whvn_api_free(&cli.api);
-    whvn_arg_free(&cli.arg);
+    arg_free(&cli.arg);
     return err;
 error:
     ERR_CLEAN;
