@@ -1,7 +1,15 @@
 #include "json.h"
 
-#define JSON_DIGITS  str("0123456789")
-#define JSON_DIGIT1  str("123456789")
+Str json_parse_value_str(JsonParseValue v) {
+    switch(v.id) {
+        case JSON_STRING:
+        case JSON_OBJECT: //return str("OBJECT");
+        case JSON_NUMBER: return v.s;
+        case JSON_BOOL: return v.b ? str("true") : str("false");
+        case JSON_ARRAY: return str("ARRAY");
+        case JSON_NULL: return str("null");
+    }
+}
 
 /* return true on match */
 bool json_parse_ch(JsonParse *p, char c) {
@@ -64,7 +72,10 @@ bool json_parse_string(JsonParse *p, Str *val) {
             escape = -1;
         } else if(json_parse_ch(&q, '"')) {
             *val = str_ll(p->head.str + 1, q.head.str - p->head.str - 2);
-            *p = q;
+            p->head = q.head;
+            if(p->key.id != JSON_ARRAY && p->key.id != JSON_OBJECT) {
+                if(p->settings.verbose) printf("%*s[string] '%.*s' : '%.*s'\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)), STR_F(*val));
+            }
             return true;
         } else if(*q.head.str >= ' ') {
             ++q.head.str;
@@ -85,7 +96,10 @@ bool json_parse_bool(JsonParse *p, bool *val) {
         if(!json_parse_ch(&q, 'u')) return false;
         if(!json_parse_ch(&q, 'e')) return false;
         *val = true;
-        *p = q;
+        if(p->key.id != JSON_ARRAY && p->key.id != JSON_OBJECT) {
+            if(p->settings.verbose) printf("%*s[bool] '%.*s' : true\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+        }
+        p->head = q.head;
         return true;
     }
     if(json_parse_ch(&q, 'f')) {
@@ -94,12 +108,18 @@ bool json_parse_bool(JsonParse *p, bool *val) {
         if(!json_parse_ch(&q, 's')) return false;
         if(!json_parse_ch(&q, 'e')) return false;
         *val = false;
-        *p = q;
+        if(p->key.id != JSON_ARRAY && p->key.id != JSON_OBJECT) {
+            if(p->settings.verbose) printf("%*s[bool] '%.*s' : false\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+        }
+        p->head = q.head;
         return true;
     }
     return false;
 }
 
+
+#define JSON_DIGITS  str("0123456789")
+#define JSON_DIGIT1  str("123456789")
 
 bool json_parse_number(JsonParse *p, Str *val) {
     ASSERT_ARG(p);
@@ -125,7 +145,10 @@ bool json_parse_number(JsonParse *p, Str *val) {
     size_t len = str_len(result);
     if(len) {
         *val = result;
-        *p = q;
+        if(p->key.id != JSON_ARRAY && p->key.id != JSON_OBJECT) {
+            if(p->settings.verbose) printf("%*s[number] '%.*s' : '%.*s'\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)), STR_F(*val));
+        }
+        p->head = q.head;
     }
     return (bool)len;
 }
@@ -137,45 +160,63 @@ bool json_parse_null(JsonParse *p) {
         if(!json_parse_ch(&q, 'u')) return false;
         if(!json_parse_ch(&q, 'l')) return false;
         if(!json_parse_ch(&q, 'l')) return false;
-        *p = q;
+        p->head = q.head;
+        if(p->key.id != JSON_ARRAY && p->key.id != JSON_OBJECT) {
+            if(p->settings.verbose) printf("%*s[null] '%.*s'\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+        }
         return true;
     }
     return false;
 }
 
-bool json_parse_value(JsonParse *p) {
-    JsonParseValue v = {0};
+bool json_parse_value(JsonParse *p, JsonParseValue *v) {
     JsonParse q = *p;
     json_parse_ws(&q);
-    if(json_parse_string(&q, &v.s)) goto valid;
-    if(json_parse_number(&q, &v.s)) goto valid;
-    if(json_parse_object(&q)) goto valid;
-    if(json_parse_array(&q)) goto valid;
-    if(json_parse_bool(&q, &v.b)) goto valid;
-    if(json_parse_null(&q)) goto valid;
+    if(json_parse_object(&q)) { v->id = JSON_OBJECT; goto valid; }
+    if(json_parse_array(&q)) { v->id = JSON_ARRAY; goto valid; }
+    /* atomic */
+    if(json_parse_string(&q, &v->s))  { v->id = JSON_STRING; goto valid; }
+    if(json_parse_number(&q, &v->s)) { v->id = JSON_NUMBER; goto valid; }
+    if(json_parse_bool(&q, &v->b)) { v->id = JSON_BOOL; goto valid; }
+    if(json_parse_null(&q)) { v->id = JSON_NULL; goto valid; }
     return false;
 valid:
     json_parse_ws(&q);
-    *p = q;
+    p->head = q.head;
     return true;
 }
 
 bool json_parse_array(JsonParse *p) {
     ASSERT_ARG(p);
+    JsonParseValue v = {0};
     JsonParse q = *p;
     if(!json_parse_ch(&q, '[')) return false;
+    q.key.id = JSON_ARRAY;
+    ++q.depth;
+    if(q.depth >= JSON_DEPTH_MAX) return false;
+    if(p->depth) {
+        if(p->settings.verbose) printf("%*s[array enter -> '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+        if(p->callback) q.callback = p->callback(&p->user, p->key, 0);
+    }
     json_parse_ws(&q);
     bool first = true;
     do {
-        if(!json_parse_value(&q)) {
+        if(!json_parse_value(&q, &v)) {
             if(first) break;
             else return false;
+        }
+        if(q.callback && v.id != JSON_OBJECT && v.id != JSON_ARRAY) {
+            if(p->settings.verbose) printf("%*s[array] '%.*s' <- '%.*s'\n", (int)q.depth, "", STR_F(json_parse_value_str(v)), STR_F(json_parse_value_str(p->key)));
+            q.callback(&p->user, q.key, &v);
         }
         if(!json_parse_ch(&q, ',')) break;
         first = false;
     } while(str_len(q.head));
     if(!json_parse_ch(&q, ']')) return false;
-    *p = q;
+    p->head = q.head;
+    if(p->depth) {
+        if(p->settings.verbose) printf("%*s[array exit <- '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+    }
     return true;
 }
 
@@ -183,8 +224,16 @@ bool json_parse_object(JsonParse *p) {
     ASSERT_ARG(p);
     JsonParse q = *p;
     if(!json_parse_ch(&q, '{')) return false;
+    q.key.id = JSON_OBJECT;
+    ++q.depth;
+    if(q.depth >= JSON_DEPTH_MAX) return false;
+    if(p->depth) {
+        if(p->settings.verbose) printf("%*s[object enter -> '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+        if(p->callback) q.callback = p->callback(&p->user, p->key, 0);
+    }
     json_parse_ws(&q);
-    JsonParseValue k = {0};
+    JsonParseValue k = { .id = JSON_OBJECT };
+    JsonParseValue v = {0};
     bool first = true;
     do {
         json_parse_ws(&q);
@@ -194,21 +243,34 @@ bool json_parse_object(JsonParse *p) {
         }
         json_parse_ws(&q);
         if(!json_parse_ch(&q, ':')) return false;
-        if(!json_parse_value(&q)) return false;
+        q.key = k;
+        if(!json_parse_value(&q, &v)) return false;
+        /* key-value pair found */
+        if(v.id != JSON_OBJECT && v.id != JSON_ARRAY) {
+            if(p->settings.verbose) printf("%*s[object] '%.*s' : '%.*s' <- '%.*s'\n", (int)q.depth, "", STR_F(json_parse_value_str(k)), STR_F(json_parse_value_str(v)), STR_F(json_parse_value_str(p->key)));
+            if(q.callback) q.callback(&p->user, q.key, &v);
+        }
+        /* next */
         if(!json_parse_ch(&q, ',')) break;
-        printff("PARSE OBJECT AGAIN!");
         first = false;
     } while(str_len(q.head));
     if(!json_parse_ch(&q, '}')) return false;
-    *p = q;
+    p->head = q.head;
+    if(p->depth) {
+        if(p->settings.verbose) printf("%*s[object exit <- '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
+    }
     return true;
 }
 
-bool json_parse(JsonParse *p) {
-    ASSERT_ARG(p);
-    JsonParse q = *p;
+bool json_parse(Str input, JsonParseCallback callback, void *user) {
+    JsonParseValue v = {0};
+    JsonParse q = {
+        .head = input,
+        .callback = callback,
+        .user = user
+    };
     json_parse_ws(&q);
-    if(json_parse_value(&q)) goto valid;
+    if(json_parse_value(&q, &v)) goto valid;
     return false;
 valid:
     json_parse_ws(&q);
