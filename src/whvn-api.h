@@ -5,6 +5,8 @@
 #include "whvn-collection.h"
 #include "whvn-user-settings.h"
 #include "whvn-user-collection.h"
+#include "whvn-meta.h"
+#include "whvn-response.h"
 
 #define WHVN_API_V1
 
@@ -17,6 +19,7 @@ typedef struct WhvnApi {
     struct {
         CURL *handle;
         bool initialized;
+        Str websafe_url;
     } curl;
     WhvnWallpaperInfo wallpaper_info;
     WhvnCollection collection;

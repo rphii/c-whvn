@@ -1,4 +1,5 @@
 #include "whvn-api.h"
+#include "whvn-json-parse.h"
 
 void whvn_api_curl_init(WhvnApi *api) {
     ASSERT_ARG(api);
@@ -11,6 +12,7 @@ void whvn_api_curl_init(WhvnApi *api) {
 void whvn_api_free(WhvnApi *api) {
     array_free_set(api->responses, Str, (ArrayFree)str_free);
     array_free(api->responses);
+    str_free(&api->curl.websafe_url);
     curl_easy_cleanup(api->curl.handle);
 }
 
@@ -35,24 +37,22 @@ error:
 }
 
 #define ERR_whvn_api_key_extend(...) "failed getting API key"
-ErrDecl whvn_api_key_extend(Str *out, WhvnApi *api, bool require) {
+int whvn_api_key_extend(Str *out, WhvnApi *api) {
     ASSERT_ARG(out);
     ASSERT_ARG(api);
-    if(require && !str_len(api->key)) THROW("no API key provided, but required!");
     if(str_len(api->key)) {
         str_extend(out, str("?apikey="));
         str_extend(out, api->key);
+        return true;
     }
-    return 0;
-error:
-    return -1;
+    return false;
 }
 
 ErrDecl whvn_api_wallpaper_info(WhvnApi *api, Str arg, WhvnWallpaperInfo *info) {
     int err = 0;
     Str url = str_dyn(STR("https://wallhaven.cc/api/v1/w/"));
     str_extend(&url, arg);
-    TRYC(whvn_api_key_extend(&url, api, false));
+    whvn_api_key_extend(&url, api);
     Str response = whvn_api_curl_do(api, url);
 clean:
     str_free(&url);
@@ -63,11 +63,33 @@ error:
 
 ErrDecl whvn_api_search(WhvnApi *api, Str arg, WhvnCollection *collection) {
     int err = 0;
-    Str url = str_dyn(STR("https://wallhaven.cc/api/v1/search/"));
-    str_extend(&url, arg);
-    TRYC(whvn_api_key_extend(&url, api, false));
+    Str url = str_dyn(STR("https://wallhaven.cc/api/v1/search"));
+    if(whvn_api_key_extend(&url, api)) {
+        str_extend(&url, str("&"));
+    } else {
+        str_extend(&url, str("?"));
+    }
+    str_extend(&url, str("q="));
+    str_fmt_websafe(&url, arg);
     Str response = whvn_api_curl_do(api, url);
+    WhvnResponse parsed = {0};
+    json_parse(str_trim(response), whvn_json_parse_response, &parsed);
+    Str color_s = STR_DYN();
+    for(size_t i = 0; i < array_len(parsed.data); ++i) {
+        WhvnWallpaperInfo info = array_at(parsed.data, i);
+        printf("%6zu %.*s " F("%.*s", UL FG_BL) " ", i, STR_F(info.id), STR_F(info.url));
+        for(size_t j = 0; j < array_len(info.colors); ++j) {
+            Color color = array_at(info.colors, j);
+            str_clear(&color_s);
+            if(color.rgba == 0x00) color.r = 0x01;
+            color_fmt_rgb_fmt(&color_s, color, str("  "));
+            printf("%.*s", STR_F(color_s));
+        }
+        printf(" " F("%lu 󰣐 ", FG_RD_B) "", info.favorites);
+        printf("\n");
+    }
 clean:
+    whvn_response_free(&parsed);
     str_free(&url);
     return err;
 error:
@@ -78,7 +100,7 @@ ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, WhvnTags *tags) {
     int err = 0;
     Str url = str_dyn(STR("https://wallhaven.cc/api/v1/tag/"));
     str_extend(&url, arg);
-    TRYC(whvn_api_key_extend(&url, api, false));
+    whvn_api_key_extend(&url, api);
     Str response = whvn_api_curl_do(api, url);
 clean:
     str_free(&url);
@@ -91,7 +113,7 @@ ErrDecl whvn_api_user_settings(WhvnApi *api, Str arg, WhvnUserSettings *settings
     int err = 0;
     Str url = str_dyn(STR("https://wallhaven.cc/api/v1/settings/"));
     str_extend(&url, arg);
-    TRYC(whvn_api_key_extend(&url, api, true));
+    if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
     Str response = whvn_api_curl_do(api, url);
 clean:
     str_free(&url);
@@ -104,7 +126,7 @@ ErrDecl whvn_api_user_collections(WhvnApi *api, Str arg, WhvnUserCollections *co
     int err = 0;
     Str url = str_dyn(STR("https://wallhaven.cc/api/v1/collections/"));
     str_extend(&url, arg);
-    TRYC(whvn_api_key_extend(&url, api, true));
+    if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
     Str response = whvn_api_curl_do(api, url);
 clean:
     str_free(&url);

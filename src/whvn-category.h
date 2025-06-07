@@ -6,6 +6,10 @@ typedef enum {
     WHVN_CATEGORY_PEOPLE  = 0x4,
 } WhvnCategoryFlag;
 
+#include <rphii/str.h>
+
+Str whvn_category_str(WhvnCategoryFlag f);
+
 #define WHVN_CATEGORY_H
 #endif
 

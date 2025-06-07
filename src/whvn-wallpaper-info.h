@@ -19,11 +19,11 @@ typedef struct WhvnWallpaperInfo {
     unsigned long       favorites;
     Str                 source;
     WhvnPurityFlag      purity;
-    WhvnCategoryFlag    categories;
+    WhvnCategoryFlag    category;
     unsigned long       dimension_x;
     unsigned long       dimension_y;
     Str                 resolution;
-    double              ratio;
+    Str                 ratio;
     unsigned long       file_size;
     Str                 file_type; /*mime?*/
     Str                 created_at; /*date?*/
@@ -34,6 +34,7 @@ typedef struct WhvnWallpaperInfo {
 } WhvnWallpaperInfo;
 
 void whvn_wallpaper_info_free(WhvnWallpaperInfo *wp);
+void whvn_wallpaper_info_print(WhvnWallpaperInfo *wp);
 
 #define WHVN_WALLPAPER_INFO_H
 #endif

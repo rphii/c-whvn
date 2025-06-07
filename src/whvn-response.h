@@ -8,6 +8,8 @@ typedef struct WhvnResponse {
     WhvnMeta meta;
 } WhvnResponse;
 
+void whvn_response_free(WhvnResponse *response);
+
 #define WHVN_RESPONSE
 #endif
 

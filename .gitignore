@@ -3,6 +3,7 @@
 *.txt
 *.vim
 *.swp
+*.json
 src/callgrind.out.*
 temp
 src/civ.out
