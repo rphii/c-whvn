@@ -16,6 +16,7 @@ typedef struct WhvnApi {
     VStr responses;
     bool print_url;
     bool print_response;
+    bool print_pretty;
     struct {
         CURL *handle;
         bool initialized;
@@ -36,6 +37,7 @@ ErrDecl whvn_api_search(WhvnApi *api, Str arg, WhvnCollection *collection);
 ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, WhvnTags *tags);
 ErrDecl whvn_api_user_settings(WhvnApi *api, Str arg, WhvnUserSettings *settings);
 ErrDecl whvn_api_user_collections(WhvnApi *api, Str arg, WhvnUserCollections *collections);
+ErrDecl whvn_api_user_collection(WhvnApi *api, Str arg, WhvnWallpaperInfo *collections);
 
 #endif
 

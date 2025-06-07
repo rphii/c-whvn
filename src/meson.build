@@ -7,8 +7,9 @@ whvn_cli_src = [
   'whvn-collection.c',
   'whvn-json-parse.c',
   'whvn-purity.c',
-  'whvn-tag.c',
   'whvn-response.c',
+  'whvn-tag.c',
+  'whvn-toplist-range.c',
   'whvn-wallpaper-info.c',
   ]
 
