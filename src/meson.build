@@ -1,10 +1,16 @@
 
 whvn_cli_src = [
+  'json.c',
   'whvn-api.c',
+  'whvn-category.c',
   'whvn-cli.c',
   'whvn-collection.c',
+  'whvn-json-parse.c',
+  'whvn-purity.c',
+  'whvn-tag.c',
+  'whvn-response.c',
   'whvn-wallpaper-info.c',
-]
+  ]
 
 cc = meson.get_compiler('c')
 dep_rphiic = dependency('rphiic', required: true)

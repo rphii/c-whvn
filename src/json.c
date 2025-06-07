@@ -1,4 +1,7 @@
 #include "json.h"
+#include <rphii/utf8.h>
+
+bool json_parse_value(JsonParse *p, JsonParseValue *v);
 
 Str json_parse_value_str(JsonParseValue v) {
     switch(v.id) {
@@ -169,23 +172,6 @@ bool json_parse_null(JsonParse *p) {
     return false;
 }
 
-bool json_parse_value(JsonParse *p, JsonParseValue *v) {
-    JsonParse q = *p;
-    json_parse_ws(&q);
-    if(json_parse_object(&q)) { v->id = JSON_OBJECT; goto valid; }
-    if(json_parse_array(&q)) { v->id = JSON_ARRAY; goto valid; }
-    /* atomic */
-    if(json_parse_string(&q, &v->s))  { v->id = JSON_STRING; goto valid; }
-    if(json_parse_number(&q, &v->s)) { v->id = JSON_NUMBER; goto valid; }
-    if(json_parse_bool(&q, &v->b)) { v->id = JSON_BOOL; goto valid; }
-    if(json_parse_null(&q)) { v->id = JSON_NULL; goto valid; }
-    return false;
-valid:
-    json_parse_ws(&q);
-    p->head = q.head;
-    return true;
-}
-
 bool json_parse_array(JsonParse *p) {
     ASSERT_ARG(p);
     JsonParseValue v = {0};
@@ -196,7 +182,7 @@ bool json_parse_array(JsonParse *p) {
     if(q.depth >= JSON_DEPTH_MAX) return false;
     if(p->depth) {
         if(p->settings.verbose) printf("%*s[array enter -> '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
-        if(p->callback) q.callback = p->callback(&p->user, p->key, 0);
+        if(p->callback) q.callback = p->callback(&q.user, p->key, 0);
     }
     json_parse_ws(&q);
     bool first = true;
@@ -207,7 +193,8 @@ bool json_parse_array(JsonParse *p) {
         }
         if(q.callback && v.id != JSON_OBJECT && v.id != JSON_ARRAY) {
             if(p->settings.verbose) printf("%*s[array] '%.*s' <- '%.*s'\n", (int)q.depth, "", STR_F(json_parse_value_str(v)), STR_F(json_parse_value_str(p->key)));
-            q.callback(&p->user, q.key, &v);
+            void *user = q.user; //p->user;
+            q.callback(&user, q.key, &v);
         }
         if(!json_parse_ch(&q, ',')) break;
         first = false;
@@ -229,7 +216,7 @@ bool json_parse_object(JsonParse *p) {
     if(q.depth >= JSON_DEPTH_MAX) return false;
     if(p->depth) {
         if(p->settings.verbose) printf("%*s[object enter -> '%.*s']\n", (int)p->depth, "", STR_F(json_parse_value_str(p->key)));
-        if(p->callback) q.callback = p->callback(&p->user, p->key, 0);
+        if(p->callback) q.callback = p->callback(&q.user, p->key, 0);
     }
     json_parse_ws(&q);
     JsonParseValue k = { .id = JSON_OBJECT };
@@ -247,8 +234,10 @@ bool json_parse_object(JsonParse *p) {
         if(!json_parse_value(&q, &v)) return false;
         /* key-value pair found */
         if(v.id != JSON_OBJECT && v.id != JSON_ARRAY) {
-            if(p->settings.verbose) printf("%*s[object] '%.*s' : '%.*s' <- '%.*s'\n", (int)q.depth, "", STR_F(json_parse_value_str(k)), STR_F(json_parse_value_str(v)), STR_F(json_parse_value_str(p->key)));
-            if(q.callback) q.callback(&p->user, q.key, &v);
+            if(p->settings.verbose) printf("%*s[object] '%.*s' : '%.*s' %u <- '%.*s'\n", (int)q.depth, "", STR_F(json_parse_value_str(k)), STR_F(json_parse_value_str(v)), v.id, STR_F(json_parse_value_str(p->key)));
+            //q.user = p->user;
+            void *user = q.user;
+            if(q.callback) q.callback(&user, q.key, &v);
         }
         /* next */
         if(!json_parse_ch(&q, ',')) break;
@@ -262,12 +251,30 @@ bool json_parse_object(JsonParse *p) {
     return true;
 }
 
+bool json_parse_value(JsonParse *p, JsonParseValue *v) {
+    JsonParse q = *p;
+    json_parse_ws(&q);
+    if(json_parse_object(&q)) { v->id = JSON_OBJECT; goto valid; }
+    if(json_parse_array(&q)) { v->id = JSON_ARRAY; goto valid; }
+    /* atomic */
+    if(json_parse_string(&q, &v->s))  { v->id = JSON_STRING; goto valid; }
+    if(json_parse_number(&q, &v->s)) { v->id = JSON_NUMBER; goto valid; }
+    if(json_parse_bool(&q, &v->b)) { v->id = JSON_BOOL; goto valid; }
+    if(json_parse_null(&q)) { v->id = JSON_NULL; goto valid; }
+    return false;
+valid:
+    json_parse_ws(&q);
+    p->head = q.head;
+    return true;
+}
+
 bool json_parse(Str input, JsonParseCallback callback, void *user) {
     JsonParseValue v = {0};
     JsonParse q = {
         .head = input,
         .callback = callback,
-        .user = user
+        .user = user,
+        .settings.verbose = false,
     };
     json_parse_ws(&q);
     if(json_parse_value(&q, &v)) goto valid;
@@ -275,5 +282,48 @@ bool json_parse(Str input, JsonParseCallback callback, void *user) {
 valid:
     json_parse_ws(&q);
     return !str_len(q.head);
+}
+
+void json_fmt_str(Str *out, Str json_str) {
+    size_t len = str_len(json_str);
+    int escape = 0;
+    size_t begin = 0;
+    for(size_t i = 0; i < len; ++i) {
+        char c = str_at(json_str, i);
+        if(!escape && c == '\\') {
+            escape = -1;
+        } else if(escape < 0) {
+            escape = 0;
+            switch(c) {
+                case 'b': str_push(out, '\b'); break;
+                case '"': str_push(out, '\"'); break;
+                case '\'': str_push(out, '\''); break;
+                case '/': str_push(out, '/'); break;
+                case 'f': str_push(out, '\f'); break;
+                case 'n': str_push(out, '\n'); break;
+                case 'r': str_push(out, '\r'); break;
+                case 't': str_push(out, '\t'); break;
+                case 'u': escape = 4; break;
+                default: break; /* TODO what do ? should never reach this */
+            }
+        } else if(escape > 0) {
+            --escape;
+            if(escape == 3) begin = i;
+            if(escape == 0) {
+                ASSERT(4 == i - begin + 1, "expect to have 4 characters...");
+                Str num = str_ll(str_it(json_str, begin), 4);
+                size_t z = 0;
+                if(!str_as_size(num, &z, 16)) {
+                    U8Point p = { .val = z };
+                    U8Str u = {0};
+                    if(!cstr_from_u8_point(u, &p)) {
+                        str_extend(out, str_ll(u, p.bytes));
+                    }
+                }
+            }
+        } else {
+            str_push(out, c);
+        }
+    }
 }
 

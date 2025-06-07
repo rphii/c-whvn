@@ -48,6 +48,7 @@ typedef struct JsonParse {
 Str json_parse_value_str(JsonParseValue v);
 bool json_parse(Str input, JsonParseCallback callback, void *user);
 
+#if 0
 bool json_parse_object(JsonParse *p);
 bool json_parse_array(JsonParse *p);
 bool json_parse_value(JsonParse *p, JsonParseValue *v);
@@ -56,6 +57,9 @@ bool json_parse_null(JsonParse *p);
 bool json_parse_bool(JsonParse *p, bool *val);
 bool json_parse_string(JsonParse *p, Str *val);
 bool json_parse_number(JsonParse *p, Str *val);
+#endif
+
+void json_fmt_str(Str *out, Str json_str);
 
 #define RPHIIC_JSON_H
 #endif
