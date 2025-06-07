@@ -21,6 +21,10 @@ int whvn_cli_user_collections(WhvnCli *cli) {
     ASSERT_ARG(cli);
     return whvn_api_user_collections(&cli->api, cli->query.user_collection, &cli->result.user_collections);
 }
+int whvn_cli_user_collection(WhvnCli *cli) {
+    ASSERT_ARG(cli);
+    return whvn_api_user_collection(&cli->api, cli->query.user_collection, &cli->result.user_collections);
+}
 
 int main(int argc, const char **argv) {
     int err = 0;
@@ -41,6 +45,8 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.api.print_url, 0);
         x=argx_init(g, 0, str("response"), str("print the raw API response"));
           argx_flag_set(x, &cli.api.print_response, 0);
+        x=argx_init(g, 0, str("pretty"), str("print the pretty output"));
+          argx_flag_set(x, &cli.api.print_pretty, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
@@ -58,7 +64,7 @@ int main(int argc, const char **argv) {
           argx_func(x, 2, whvn_cli_user_collections, &cli, false);
         x=argx_init(g, 0, str("user-collection"), str("get a user's collection"));
           argx_str(x, &cli.query.user_collection, 0);
-          argx_func(x, 2, whvn_cli_user_collections, &cli, false);
+          argx_func(x, 2, whvn_cli_user_collection, &cli, false);
           argx_type(x, str("user/id"));
 
     //whvn_api_wallpaper_info(&cli.api, STR("vpmexp"), &cli.info);
