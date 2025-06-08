@@ -147,6 +147,9 @@ void *whvn_json_parse_wallpaper_info(void **user, JsonParseValue key, JsonParseV
 
 void *whvn_json_parse_data_wallpaper_info(void **user, JsonParseValue key, JsonParseValue *val) {
     //printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_str(key)));
+    if(key.id == JSON_OBJECT) {
+        return whvn_json_parse_wallpaper_info;
+    }
     WhvnWallpaperInfo **data = *(WhvnWallpaperInfo ***)user;
     size_t len = array_len(*data);
     array_resize(*data, len + 1);

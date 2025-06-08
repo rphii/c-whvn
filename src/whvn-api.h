@@ -5,8 +5,8 @@
 #include "whvn-collection.h"
 #include "whvn-user-settings.h"
 #include "whvn-user-collection.h"
-#include "whvn-meta.h"
 #include "whvn-response.h"
+#include "whvn-api-search.h"
 
 #define WHVN_API_V1
 
@@ -16,7 +16,6 @@ typedef struct WhvnApi {
     VStr responses;
     bool print_url;
     bool print_response;
-    bool print_pretty;
     struct {
         CURL *handle;
         bool initialized;
@@ -33,11 +32,11 @@ void whvn_api_curl_init(WhvnApi *api);
 void whvn_api_free(WhvnApi *api);
 
 ErrDecl whvn_api_wallpaper_info(WhvnApi *api, Str arg, WhvnWallpaperInfo *info);
-ErrDecl whvn_api_search(WhvnApi *api, Str arg, WhvnCollection *collection);
-ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, WhvnTags *tags);
+ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, WhvnResponse *response);
+ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, WhvnTag *tag_info);
 ErrDecl whvn_api_user_settings(WhvnApi *api, Str arg, WhvnUserSettings *settings);
 ErrDecl whvn_api_user_collections(WhvnApi *api, Str arg, WhvnUserCollections *collections);
-ErrDecl whvn_api_user_collection(WhvnApi *api, Str arg, WhvnWallpaperInfo *collections);
+ErrDecl whvn_api_user_collection(WhvnApi *api, Str arg, WhvnResponse *response);
 
 #endif
 

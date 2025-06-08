@@ -8,19 +8,13 @@
 typedef struct WhvnCli {
     struct Arg *arg;
     WhvnApi api;
+    WhvnApiSearch search;
     struct {
         Str wallpaper_info;
-        Str search;
         Str tag_info;
         Str user_collection;
     } query;
-    struct {
-        WhvnWallpaperInfo wallpaper_info;
-        WhvnCollection search;
-        WhvnTags tag_info;
-        WhvnUserSettings user_settings;
-        WhvnUserCollections user_collections;
-    } result;
+    bool print_pretty;
 } WhvnCli;
 
 #define WHVN_CLI_H

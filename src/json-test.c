@@ -155,6 +155,11 @@ int main(void) {
 
 #if 1
     Str content = {0};
+    file_str_read(str("/home/rphii/dev/nioh2-mods/mods/randomizer/randomizer-0.1.0/default-2x.json"), &content);
+    json_parse(content, 0, 0);
+#else
+#if 1
+    Str content = {0};
     WhvnResponse response = {0};
 #if 0
     file_str_read(str("test.json"), &content);
@@ -184,6 +189,7 @@ int main(void) {
     str_free(response.meta.seed);
 #endif
     str_free(&content);
+#endif
 #endif
 
 }
