@@ -1,6 +1,6 @@
 #ifndef WHVN_JSON_PARSE_H
 
-#include "json.h"
+#include <rphii/json.h>
 #include "whvn-api.h"
 
 void *whvn_json_parse_thumbs(void **user, JsonParseValue key, JsonParseValue *val);

@@ -1,5 +1,4 @@
 #include "whvn-json-parse.h"
-#include "whvn.h"
 
 void whvn_json_value_parse_purity(JsonParseValue v, WhvnPurity *purity) {
     if(!str_cmp(v.s, str("sfw"))) purity->sfw = true;

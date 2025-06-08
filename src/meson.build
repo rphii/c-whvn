@@ -1,6 +1,5 @@
 
 whvn_cli_src = [
-  'json.c',
   'whvn-api-search.c',
   'whvn-api.c',
   'whvn-category.c',
