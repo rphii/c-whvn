@@ -26,7 +26,6 @@ typedef struct WhvnApi {
     WhvnTags            tags;
     WhvnUserSettings    user_settings;
 } WhvnApi;
-#include "whvn.h"
 
 void whvn_api_curl_init(WhvnApi *api);
 void whvn_api_free(WhvnApi *api);
