@@ -342,3 +342,52 @@ void json_fmt_str(Str *out, Str json_str) {
     }
 }
 
+void json_fix_str(Str *out, Str json_str) {
+    size_t len = str_len(json_str);
+    int escape = 0;
+    size_t begin = 0;
+    size_t j = 0;
+    for(size_t i = 0; i < len; ++i) {
+        char c = str_at(json_str, i);
+        if(!escape && c == '\\') {
+            escape = -1;
+        } else if(escape < 0) {
+            escape = 0;
+            switch(c) {
+                case 'b':  *str_it(json_str, j++) = '\b'; break;
+                case '"':  *str_it(json_str, j++) = '\"'; break;
+                case '\'': *str_it(json_str, j++) = '\''; break;
+                case '/':  *str_it(json_str, j++) = '/';  break;
+                case 'f':  *str_it(json_str, j++) = '\f'; break;
+                case 'n':  *str_it(json_str, j++) = '\n'; break;
+                case 'r':  *str_it(json_str, j++) = '\r'; break;
+                case 't':  *str_it(json_str, j++) = '\t'; break;
+                case 'u': escape = 4; break;
+                default: break; /* TODO what do ? should never reach this */
+            }
+        } else if(escape > 0) {
+            --escape;
+            if(escape == 3) begin = i;
+            if(escape == 0) {
+                ASSERT(4 == i - begin + 1, "expect to have 4 characters...");
+                Str num = str_ll(str_it(json_str, begin), 4);
+                size_t z = 0;
+                if(!str_as_size(num, &z, 16)) {
+                    U8Point p = { .val = z };
+                    U8Str u = {0};
+                    if(!cstr_from_u8_point(u, &p)) {
+                        ASSERT(p.bytes <= 3, "expect to have 3 or less characters (0xFFFF max)...");
+                        for(size_t k = 0; k < p.bytes; ++k) {
+                            *str_it(json_str, ++j) = u[k];
+                        }
+                    }
+                }
+            }
+        } else {
+            *str_it(json_str, j++) = c;
+        }
+    }
+    json_str.len = j;
+    *out = json_str;
+}
+

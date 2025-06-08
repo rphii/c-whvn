@@ -63,7 +63,8 @@ bool json_parse_string(JsonParse *p, Str *val);
 bool json_parse_number(JsonParse *p, Str *val);
 #endif
 
-void json_fmt_str(Str *out, Str json_str);
+void json_fmt_str(Str *out, Str json_str); /* creates a new string; additional memory allocation */
+void json_fix_str(Str *out, Str json_str); /* modifies the existing string; no additional memory allocation */
 
 #define RPHIIC_JSON_H
 #endif

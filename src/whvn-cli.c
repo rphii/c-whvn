@@ -22,38 +22,43 @@ void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
 int whvn_cli_wallpaper_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnWallpaperInfo info = {0};
-    int result = whvn_api_wallpaper_info(&cli->api, cli->query.wallpaper_info, &info);
+    int result = whvn_api_wallpaper_info(&cli->api, cli->query.wallpaper_info, &cli->api_buf, &info);
     if(cli->print_pretty) {
         whvn_cli_wallpaper_info_print(info, 0);
     }
+    whvn_wallpaper_info_free(&info);
     return result;
 }
+
 int whvn_cli_search(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnResponse response = {0};
-    int result = whvn_api_search(&cli->api, &cli->search, &response);
+    int result = whvn_api_search(&cli->api, &cli->search, &cli->api_buf, &response);
     if(cli->print_pretty) {
         for(size_t i = 0; i < array_len(response.data); ++i) {
             WhvnWallpaperInfo info = array_at(response.data, i);
             whvn_cli_wallpaper_info_print(info, i);
         }
     }
+    whvn_response_free(&response);
     return result;
 }
+
 int whvn_cli_tag_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnTag tag_info = {0};
-    int result = whvn_api_tag_info(&cli->api, cli->query.tag_info, &tag_info);
+    int result = whvn_api_tag_info(&cli->api, cli->query.tag_info, &cli->api_buf, &tag_info);
     if(cli->print_pretty) {
         printf("%6lu %.*s (%.*s) - %zu \"%.*s\" %.*s - %.*s\n", tag_info.id, STR_F(tag_info.name), STR_F(tag_info.alias),
                 tag_info.category_id, STR_F(tag_info.category), STR_F(whvn_purity_str(tag_info.purity)), STR_F(tag_info.created_at));
     }
     return result;
 }
+
 int whvn_cli_user_settings(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserSettings settings = {0};
-    int result = whvn_api_user_settings(&cli->api, str(""), &settings);
+    int result = whvn_api_user_settings(&cli->api, str(""), &cli->api_buf, &settings);
     if(cli->print_pretty) {
         printf("thumb_size: %.*s\n", STR_F(settings.thumb_size));
         printf("per_page: %zu\n", settings.per_page);
@@ -78,30 +83,35 @@ int whvn_cli_user_settings(WhvnCli *cli) {
         }
         printf("ai_art_filter: %s\n", settings.ai_art_filter ? "true" : "false");
     }
+    whvn_user_settings_free(&settings);
     return result;
 }
+
 int whvn_cli_user_collections(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserCollections collections = {0};
-    int result = whvn_api_user_collections(&cli->api, cli->query.user_collection, &collections);
+    int result = whvn_api_user_collections(&cli->api, cli->query.user_collection, &cli->api_buf, &collections);
     if(cli->print_pretty) {
         for(size_t i = 0; i < array_len(collections); ++i) {
             WhvnUserCollection collection = array_at(collections, i);
             printf("%6zu %.*s %zux (%s)\n", collection.id, STR_F(collection.label), collection.count, collection.is_public ? "public" : "private");
         }
     }
+    array_free(collections);
     return result;
 }
+
 int whvn_cli_user_collection(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnResponse response = {0};
-    int result = whvn_api_user_collection(&cli->api, cli->query.user_collection, &response);
+    int result = whvn_api_user_collection(&cli->api, cli->query.user_collection, &cli->api_buf, &response);
     if(cli->print_pretty) {
         for(size_t i = 0; i < array_len(response.data); ++i) {
             WhvnWallpaperInfo info = array_at(response.data, i);
             whvn_cli_wallpaper_info_print(info, i);
         }
     }
+    whvn_response_free(&response);
     return result;
 }
 
@@ -205,9 +215,6 @@ int main(int argc, const char **argv) {
     x=argx_init(arg_opt(arg), 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
 
-    //whvn_api_wallpaper_info(&cli.api, STR("vpmexp"), &cli.info);
-    //whvn_collection_add(&cli.coll, &cli.info);
-
     argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), &cli.api.key, 0, true);
 
     bool quit_early = false;
@@ -215,6 +222,7 @@ int main(int argc, const char **argv) {
 
 clean:
     whvn_api_free(&cli.api);
+    str_free(&cli.api_buf);
     arg_free(&cli.arg);
     //printf("done\n");
     return err;
