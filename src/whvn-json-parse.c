@@ -142,20 +142,25 @@ void *whvn_json_parse_wallpaper_info(void **user, JsonParseValue key, JsonParseV
 }
 
 void *whvn_json_parse_data_wallpaper_info(void **user, JsonParseValue key, JsonParseValue *val) {
-    //printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_str(key)));
     if(key.id == JSON_OBJECT) {
         return whvn_json_parse_wallpaper_info;
     }
-    WhvnWallpaperInfo **data = *(WhvnWallpaperInfo ***)user;
-    size_t len = array_len(*data);
-    array_resize(*data, len + 1);
-    *user = array_it(*data, len);
-    return whvn_json_parse_wallpaper_info;
+    if(key.id == JSON_ARRAY) {
+        WhvnWallpaperInfos *data = *(WhvnWallpaperInfos **)user;
+        size_t len = array_len(*data);
+        array_resize(*data, len + 1);
+        *user = array_it(*data, len);
+        return whvn_json_parse_wallpaper_info;
+    }
+    return 0;
 }
 
+//printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_str(key)));
+    
 void *whvn_json_parse_tag_info(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
-    //printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_str(key)));
+    if(key.id != JSON_OBJECT) return 0;
+    if(!val) return 0;
+    JsonParseValue v = *val;
     WhvnTag *tag = *(WhvnTag **)user;
     size_t z = 0;
     if(v.id == JSON_NUMBER) str_as_size(v.s, &z, 10);
@@ -274,30 +279,25 @@ void *whvn_json_parse_data_user_collections(void **user, JsonParseValue key, Jso
     return 0;
 }
 
-void *whvn_json_parse_data_user_collection(void **user, JsonParseValue key, JsonParseValue *val) {
-}
-
 
 void *whvn_json_parse_meta(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
-    //printff(" %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_str(key)), STR_F(json_parse_value_str(v)));
-    if(val && user) {
-        WhvnMeta *meta = (*(WhvnMeta **)user);
-        if(!meta) assert(0);
-        size_t z = 0;
-        if(val->id == JSON_NUMBER) str_as_size(val->s, &z, 10);
-        if(!str_cmp(key.s, str("current_page"))) meta->current_page = (unsigned long)z;
-        else if(!str_cmp(key.s, str("last_page"))) meta->last_page = (unsigned long)z;
-        else if(!str_cmp(key.s, str("per_page"))) meta->per_page = (unsigned long)z;
-        else if(!str_cmp(key.s, str("total"))) meta->total = (unsigned long)z;
-        else if(!str_cmp(key.s, str("query"))) json_fmt_str(&meta->query, val->s);
-        else if(!str_cmp(key.s, str("seed"))) {}
-    }
+    if(key.id != JSON_OBJECT) return 0;
+    if(!val) return 0;
+    WhvnMeta *meta = (*(WhvnMeta **)user);
+    if(!meta) assert(0);
+    size_t z = 0;
+    if(val->id == JSON_NUMBER) str_as_size(val->s, &z, 10);
+    if(!str_cmp(key.s, str("current_page"))) meta->current_page = (unsigned long)z;
+    else if(!str_cmp(key.s, str("last_page"))) meta->last_page = (unsigned long)z;
+    else if(!str_cmp(key.s, str("per_page"))) meta->per_page = (unsigned long)z;
+    else if(!str_cmp(key.s, str("total"))) meta->total = (unsigned long)z;
+    else if(!str_cmp(key.s, str("query"))) json_fmt_str(&meta->query, val->s);
+    else if(!str_cmp(key.s, str("seed"))) {}
     return 0;
 }
 
-void *whvn_json_parse_response(void **user, JsonParseValue key, JsonParseValue *val) {
     //printff("%s - '%.*s'", __func__, STR_F(json_parse_value_str(key)));
+void *whvn_json_parse_response(void **user, JsonParseValue key, JsonParseValue *val) {
     if(key.id == JSON_OBJECT && !str_cmp(key.s, str("data"))) {
         *user = (WhvnWallpaperInfo *)&(*(WhvnResponse **)user)->data;
         return whvn_json_parse_data_wallpaper_info;

@@ -31,7 +31,7 @@ typedef struct WhvnWallpaperInfo {
     Str                 path;
     WhvnThumbs          thumbs;
     WhvnTags            tags;
-} WhvnWallpaperInfo;
+} WhvnWallpaperInfo, *WhvnWallpaperInfos;
 
 void whvn_wallpaper_info_free(WhvnWallpaperInfo *wp);
 void whvn_wallpaper_info_print(WhvnWallpaperInfo *wp);
