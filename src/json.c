@@ -268,7 +268,21 @@ valid:
     return true;
 }
 
+ErrDecl json_parse_valid(Str input) {
+    JsonParseValue v = {0};
+    JsonParse q = {
+        .head = input,
+        .settings.verbose = false,
+    };
+    if(json_parse_value(&q, &v)) goto valid;
+    return -1;
+valid:
+    json_parse_ws(&q);
+    return str_len(q.head);
+}
+
 ErrDecl json_parse(Str input, JsonParseCallback callback, void *user) {
+    if(json_parse_valid(input)) goto invalid;
     JsonParseValue v = {0};
     JsonParse q = {
         .head = input,
@@ -278,6 +292,7 @@ ErrDecl json_parse(Str input, JsonParseCallback callback, void *user) {
     };
     json_parse_ws(&q);
     if(json_parse_value(&q, &v)) goto valid;
+invalid:
     return -1;
 valid:
     json_parse_ws(&q);

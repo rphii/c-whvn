@@ -46,6 +46,9 @@ typedef struct JsonParse {
 } JsonParse;
 
 Str json_parse_value_str(JsonParseValue v);
+
+ErrDecl json_parse_valid(Str input);
+
 #define ERR_json_parse(...) "failed parsing json (invalid input)"
 ErrDecl json_parse(Str input, JsonParseCallback callback, void *user);
 
