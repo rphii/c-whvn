@@ -1,14 +1,17 @@
 #ifndef WHVN_PURITY_H
 
-typedef enum {
-    WHVN_PURITY_SFW     = 0x1,
-    WHVN_PURITY_SKETCHY = 0x4,
-    WHVN_PURITY_NSFW    = 0x2,
-} WhvnPurityFlag;
+#include <stdbool.h>
+
+typedef struct WhvnPurity {
+    bool sfw;
+    bool sketchy;
+    bool nsfw;
+} WhvnPurity;
 
 #include <rphii/str.h>
 
-Str whvn_purity_str(WhvnPurityFlag f);
+Str whvn_purity_str(WhvnPurity f);
+bool whvn_purity_is_set(WhvnPurity f);
 
 #define WHVN_PURITY_H
 #endif
