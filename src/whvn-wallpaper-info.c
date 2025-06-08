@@ -2,26 +2,7 @@
 
 void whvn_wallpaper_info_free(WhvnWallpaperInfo *wp) {
     ASSERT_ARG(wp);
-    str_free(&wp->id);
-    str_free(&wp->url);
-    str_free(&wp->short_url);
-    str_free(&wp->uploader.username);
-    str_free(&wp->uploader.group);
-    str_free(&wp->uploader.avatar.px200);
-    str_free(&wp->uploader.avatar.px128);
-    str_free(&wp->uploader.avatar.px32);
-    str_free(&wp->uploader.avatar.px20);
-    str_free(&wp->source);
-    str_free(&wp->resolution);
-    str_free(&wp->ratio);
-    str_free(&wp->file_type);
-    str_free(&wp->created_at);
     array_free(wp->colors);
-    str_free(&wp->path);
-    str_free(&wp->thumbs.small);
-    str_free(&wp->thumbs.large);
-    str_free(&wp->thumbs.original);
-    array_free_set(wp->tags, WhvnTag, (ArrayFree)whvn_tag_free);
     array_free(wp->tags);
 #ifndef NDEBUG
     memset(wp, 0, sizeof(*wp));
@@ -64,13 +45,6 @@ void whvn_wallpaper_info_print(WhvnWallpaperInfo *wp) {
         printf(" tag.id %lu name %.*s alias %.*s category_id %lu category %.*s purity %.*s created_at %.*s\n",
                 tag.id, STR_F(tag.name), STR_F(tag.alias), tag.category_id, STR_F(tag.category),
                 STR_F(whvn_purity_str(tag.purity)), STR_F(tag.created_at));
-
-        //printf(" tag.name %.*s\n", STR_F(tag.name));
-        //printf(" tag.alias %.*s\n", STR_F(tag.alias));
-        //printf(" tag.category_id %lu\n", tag.category_id);
-        //printf(" tag.category %.*s\n", STR_F(tag.category));
-        //printf(" tag.purity %.*s\n", STR_F(whvn_purity_str(tag.purity)));
-        //printf(" tag.created_at %.*s\n", STR_F(tag.created_at));
     }
     printf("path %.*s\n", STR_F(wp->path));
     printf("thumbs.small %.*s\n", STR_F(wp->thumbs.small));

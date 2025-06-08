@@ -11,12 +11,14 @@ typedef struct WhvnUserSettings {
     WhvnCategory            categories;
     WhvnPurity              purity;
     VStr                    resolutions;
-    VStr                    aspect_ratios;
+    VStr                    aspect_ratios; /* TODO use whvn-resolution */
     WhvnToplistRangeList    toplist_range;
     VStr                    tag_blacklist;
     VStr                    user_blacklist;
     bool                    ai_art_filter;
 } WhvnUserSettings;
+
+void whvn_user_settings_free(WhvnUserSettings *settings);
 
 #define WHVN_USER_SETTINGS_H
 #endif

@@ -11,6 +11,7 @@ whvn_cli_src = [
   'whvn-response.c',
   'whvn-tag.c',
   'whvn-toplist-range.c',
+  'whvn-user-settings.c',
   'whvn-wallpaper-info.c',
   ]
 

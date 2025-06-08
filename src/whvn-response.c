@@ -6,6 +6,7 @@ void whvn_response_free(WhvnResponse *response) {
         WhvnWallpaperInfo info = array_at(response->data, i);
         whvn_wallpaper_info_free(&info);
     }
+    array_free(response->data);
     str_free(&response->meta.query);
     str_free(response->meta.seed);
 #ifndef NDEBUG

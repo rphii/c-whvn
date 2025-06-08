@@ -31,12 +31,12 @@ typedef struct WhvnApi {
 void whvn_api_curl_init(WhvnApi *api);
 void whvn_api_free(WhvnApi *api);
 
-ErrDecl whvn_api_wallpaper_info(WhvnApi *api, Str arg, WhvnWallpaperInfo *info);
-ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, WhvnResponse *response);
-ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, WhvnTag *tag_info);
-ErrDecl whvn_api_user_settings(WhvnApi *api, Str arg, WhvnUserSettings *settings);
-ErrDecl whvn_api_user_collections(WhvnApi *api, Str arg, WhvnUserCollections *collections);
-ErrDecl whvn_api_user_collection(WhvnApi *api, Str arg, WhvnResponse *response);
+ErrDecl whvn_api_wallpaper_info(WhvnApi *api, Str arg, Str *buf, WhvnWallpaperInfo *info);
+ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, Str *buf, WhvnResponse *response);
+ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, Str *buf, WhvnTag *tag_info);
+ErrDecl whvn_api_user_settings(WhvnApi *api, Str arg, Str *buf, WhvnUserSettings *settings);
+ErrDecl whvn_api_user_collections(WhvnApi *api, Str arg, Str *buf, WhvnUserCollections *collections);
+ErrDecl whvn_api_user_collection(WhvnApi *api, Str arg, Str *buf, WhvnResponse *response);
 
 #endif
 
