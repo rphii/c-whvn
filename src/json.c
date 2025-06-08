@@ -268,7 +268,7 @@ valid:
     return true;
 }
 
-bool json_parse(Str input, JsonParseCallback callback, void *user) {
+ErrDecl json_parse(Str input, JsonParseCallback callback, void *user) {
     JsonParseValue v = {0};
     JsonParse q = {
         .head = input,
@@ -278,10 +278,10 @@ bool json_parse(Str input, JsonParseCallback callback, void *user) {
     };
     json_parse_ws(&q);
     if(json_parse_value(&q, &v)) goto valid;
-    return false;
+    return -1;
 valid:
     json_parse_ws(&q);
-    return !str_len(q.head);
+    return str_len(q.head);
 }
 
 void json_fmt_str(Str *out, Str json_str) {

@@ -12,8 +12,8 @@
 
 #if defined(WHVN_API_V1)
 typedef struct WhvnApi {
+    Str                 url;
     Str                 key;
-    VStr                responses;
     bool                print_url;
     bool                print_response;
     struct {
