@@ -1,20 +1,16 @@
 #include "whvn-json-parse.h"
 #include "whvn.h"
 
-WhvnPurityFlag whvn_json_value_parse_purity(JsonParseValue v) {
-    WhvnPurityFlag purity = 0;
-    if(!str_cmp(v.s, str("sfw"))) purity = WHVN_PURITY_SFW;
-    if(!str_cmp(v.s, str("nsfw"))) purity = WHVN_PURITY_NSFW;
-    if(!str_cmp(v.s, str("sketchy"))) purity = WHVN_PURITY_SKETCHY;
-    return purity;
+void whvn_json_value_parse_purity(JsonParseValue v, WhvnPurity *purity) {
+    if(!str_cmp(v.s, str("sfw"))) purity->sfw = true;
+    if(!str_cmp(v.s, str("nsfw"))) purity->nsfw = true;
+    if(!str_cmp(v.s, str("sketchy"))) purity->sketchy = true;
 }
 
-WhvnCategoryFlag whvn_json_value_parse_category(JsonParseValue v) {
-    WhvnCategoryFlag category = 0;
-    if(!str_cmp(v.s, str("people"))) category = WHVN_CATEGORY_PEOPLE;
-    if(!str_cmp(v.s, str("anime"))) category = WHVN_CATEGORY_ANIME;
-    if(!str_cmp(v.s, str("general"))) category = WHVN_CATEGORY_GENERAL;
-    return category;
+void whvn_json_value_parse_category(JsonParseValue v, WhvnCategory *category) {
+    if(!str_cmp(v.s, str("people"))) category->people = true;
+    if(!str_cmp(v.s, str("anime"))) category->anime = true;
+    if(!str_cmp(v.s, str("general"))) category->general = true;
 }
 
 WhvnToplistRangeList whvn_json_value_parse_toplist_range(JsonParseValue v) {
@@ -61,7 +57,7 @@ void *whvn_json_parse_tag(void **user, JsonParseValue key, JsonParseValue *val) 
     if(!str_cmp(key.s, str("alias"))) json_fmt_str(&tag->alias, v.s);
     if(!str_cmp(key.s, str("category_id"))) tag->category_id = z;
     if(!str_cmp(key.s, str("category"))) json_fmt_str(&tag->category, v.s);
-    if(!str_cmp(key.s, str("purity"))) tag->purity = whvn_json_value_parse_purity(v);
+    if(!str_cmp(key.s, str("purity"))) whvn_json_value_parse_purity(v, &tag->purity);
     if(!str_cmp(key.s, str("created_at"))) json_fmt_str(&tag->created_at, v.s);
     return 0;
 }
@@ -131,8 +127,8 @@ void *whvn_json_parse_wallpaper_info(void **user, JsonParseValue key, JsonParseV
         else if(!str_cmp(key.s, str("views"))) info->views = (unsigned long)z;
         else if(!str_cmp(key.s, str("favorites"))) info->favorites = (unsigned long)z;
         else if(!str_cmp(key.s, str("source"))) json_fmt_str(&info->source, v.s);
-        else if(!str_cmp(key.s, str("purity"))) info->purity = whvn_json_value_parse_purity(v);
-        else if(!str_cmp(key.s, str("category"))) info->category = whvn_json_value_parse_category(v);
+        else if(!str_cmp(key.s, str("purity"))) whvn_json_value_parse_purity(v, &info->purity);
+        else if(!str_cmp(key.s, str("category"))) whvn_json_value_parse_category(v, &info->category);
         else if(!str_cmp(key.s, str("dimension_x"))) info->dimension_x = (unsigned long)z;
         else if(!str_cmp(key.s, str("dimension_y"))) info->dimension_y = (unsigned long)z;
         else if(!str_cmp(key.s, str("resolution"))) json_fmt_str(&info->resolution, v.s);
@@ -168,7 +164,7 @@ void *whvn_json_parse_tag_info(void **user, JsonParseValue key, JsonParseValue *
     else if(!str_cmp(key.s, str("alias"))) json_fmt_str(&tag->alias, v.s);
     else if(!str_cmp(key.s, str("category_id"))) tag->category_id = z;
     else if(!str_cmp(key.s, str("category"))) json_fmt_str(&tag->category, v.s);
-    else if(!str_cmp(key.s, str("purity"))) tag->purity = whvn_json_value_parse_purity(v);
+    else if(!str_cmp(key.s, str("purity"))) whvn_json_value_parse_purity(v, &tag->purity);
     else if(!str_cmp(key.s, str("created_at"))) json_fmt_str(&tag->created_at, v.s);
     return 0;
 }
@@ -185,7 +181,7 @@ void *whvn_json_parse_user_settings_purity(void **user, JsonParseValue key, Json
     //printf(" %s - '%.*s' : '%.*s'\n", __func__, STR_F(json_parse_value_str(key)), STR_F(v.s));
     if(!val) return 0;
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
-    settings->purity |= whvn_json_value_parse_purity(*val);
+    whvn_json_value_parse_purity(*val, &settings->purity);
     return 0;
 }
 
@@ -194,7 +190,7 @@ void *whvn_json_parse_user_settings_categories(void **user, JsonParseValue key, 
     //printf(" %s - '%.*s' : '%.*s'\n", __func__, STR_F(json_parse_value_str(key)), STR_F(v.s));
     if(!val) return 0;
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
-    settings->categories |= whvn_json_value_parse_category(*val);
+    whvn_json_value_parse_category(*val, &settings->categories);
     return 0;
 }
 

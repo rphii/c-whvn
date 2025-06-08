@@ -8,8 +8,8 @@
 typedef struct WhvnUserSettings {
     Str                     thumb_size;
     unsigned long           per_page;
-    WhvnCategoryFlag        categories;
-    WhvnPurityFlag          purity;
+    WhvnCategory            categories;
+    WhvnPurity              purity;
     VStr                    resolutions;
     VStr                    aspect_ratios;
     WhvnToplistRangeList    toplist_range;

@@ -12,19 +12,19 @@
 
 #if defined(WHVN_API_V1)
 typedef struct WhvnApi {
-    Str key;
-    VStr responses;
-    bool print_url;
-    bool print_response;
+    Str                 key;
+    VStr                responses;
+    bool                print_url;
+    bool                print_response;
     struct {
-        CURL *handle;
-        bool initialized;
-        Str websafe_url;
+        CURL            *handle;
+        bool            initialized;
+        Str             websafe_url;
     } curl;
-    WhvnWallpaperInfo wallpaper_info;
-    WhvnCollection collection;
-    WhvnTags tags;
-    WhvnUserSettings user_settings;
+    WhvnWallpaperInfo   wallpaper_info;
+    WhvnCollection      collection;
+    WhvnTags            tags;
+    WhvnUserSettings    user_settings;
 } WhvnApi;
 #include "whvn.h"
 

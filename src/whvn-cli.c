@@ -1,22 +1,30 @@
 #include <rphii/arg.h>
 #include "whvn-cli.h"
+#include "whvn-purity.h"
+
+void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
+    Str color_s = STR_DYN();
+    const char *purity_fmt = info.purity.nsfw ? FG_RD_B BOLD : info.purity.sketchy ? FG_YL_B BOLD : FG_GN_B BOLD;
+    printf(F("%6zu", FG_BK_B) " " F("wallhaven-", IT) FS_BEG FS_FMT FS_END F("%.*s", IT) " " F("%.*s", UL FG_BL) " ",
+            index, purity_fmt, STR_F(info.id), STR_F(str_get_ext(info.path)), STR_F(info.url));
+    for(size_t j = 0; j < array_len(info.colors); ++j) {
+        Color color = array_at(info.colors, j);
+        str_clear(&color_s);
+        if(color.rgba == 0x00) color.r = 0x01;
+        color_fmt_rgb_fmt(&color_s, color, str("  "));
+        printf("%.*s", STR_F(color_s));
+    }
+    printf(" " F("󰣐 %lu", FG_RD_B) "", info.favorites);
+    printf("\n");
+    str_free(&color_s);
+}
 
 int whvn_cli_wallpaper_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnWallpaperInfo info = {0};
     int result = whvn_api_wallpaper_info(&cli->api, cli->query.wallpaper_info, &info);
     if(cli->print_pretty) {
-        Str color_s = STR_DYN();
-        printf(F("%6s", FG_BK_B) " " F("wallhaven-", IT) F("%.*s", BOLD) F("%.*s", IT) " " F("%.*s", UL FG_BL) " ", "", STR_F(info.id), STR_F(str_get_ext(info.path)), STR_F(info.url));
-        for(size_t j = 0; j < array_len(info.colors); ++j) {
-            Color color = array_at(info.colors, j);
-            str_clear(&color_s);
-            if(color.rgba == 0x00) color.r = 0x01;
-            color_fmt_rgb_fmt(&color_s, color, str("  "));
-            printf("%.*s", STR_F(color_s));
-        }
-        printf(" " F("󰣐 %lu", FG_RD_B) "", info.favorites);
-        printf("\n");
+        whvn_cli_wallpaper_info_print(info, 0);
     }
     return result;
 }
@@ -25,19 +33,9 @@ int whvn_cli_search(WhvnCli *cli) {
     WhvnResponse response = {0};
     int result = whvn_api_search(&cli->api, &cli->search, &response);
     if(cli->print_pretty) {
-        Str color_s = STR_DYN();
         for(size_t i = 0; i < array_len(response.data); ++i) {
             WhvnWallpaperInfo info = array_at(response.data, i);
-            printf(F("%6zu", FG_BK_B) " " F("wallhaven-", IT) F("%.*s", BOLD) F("%.*s", IT) " " F("%.*s", UL FG_BL) " ", i, STR_F(info.id), STR_F(str_get_ext(info.path)), STR_F(info.url));
-            for(size_t j = 0; j < array_len(info.colors); ++j) {
-                Color color = array_at(info.colors, j);
-                str_clear(&color_s);
-                if(color.rgba == 0x00) color.r = 0x01;
-                color_fmt_rgb_fmt(&color_s, color, str("  "));
-                printf("%.*s", STR_F(color_s));
-            }
-            printf(" " F("󰣐 %lu", FG_RD_B) "", info.favorites);
-            printf("\n");
+            whvn_cli_wallpaper_info_print(info, i);
         }
     }
     return result;
@@ -99,19 +97,9 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     WhvnResponse response = {0};
     int result = whvn_api_user_collection(&cli->api, cli->query.user_collection, &response);
     if(cli->print_pretty) {
-        Str color_s = STR_DYN();
         for(size_t i = 0; i < array_len(response.data); ++i) {
             WhvnWallpaperInfo info = array_at(response.data, i);
-            printf(F("%6zu", FG_BK_B) " " F("wallhaven-", IT) F("%.*s", BOLD) F("%.*s", IT) " " F("%.*s", UL FG_BL) " ", i, STR_F(info.id), STR_F(str_get_ext(info.path)), STR_F(info.url));
-            for(size_t j = 0; j < array_len(info.colors); ++j) {
-                Color color = array_at(info.colors, j);
-                str_clear(&color_s);
-                if(color.rgba == 0x00) color.r = 0x01;
-                color_fmt_rgb_fmt(&color_s, color, str("  "));
-                printf("%.*s", STR_F(color_s));
-            }
-            printf(" " F("󰣐 %lu", FG_RD_B) "", info.favorites);
-            printf("\n");
+            whvn_cli_wallpaper_info_print(info, i);
         }
     }
     return result;
@@ -123,14 +111,14 @@ int main(int argc, const char **argv) {
     WhvnCli cli = {0};
     cli.arg = arg_new();
     struct Arg *arg = cli.arg;
-    arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str("https://github.com/rphii/c-whvn"));
-    arg_init_width(cli.arg, 0, 90);
+    arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
+    arg_init_width(cli.arg, 100, 45);
 
     struct ArgX *x = 0;
     struct ArgXGroup *g = 0;
     x=argx_init(arg_opt(arg), 'h', str("help"), str("display this help"));
       argx_help(x, arg);
-    x=argx_init(arg_opt(arg), 'p', str("print"), str("print the raw API response"));
+    x=argx_init(arg_opt(arg), 'P', str("print"), str("print the raw API response"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("url"), str("print the raw API URL"));
           argx_flag_set(x, &cli.api.print_url, 0);
@@ -157,6 +145,62 @@ int main(int argc, const char **argv) {
           argx_str(x, &cli.query.user_collection, 0);
           argx_func(x, 2, whvn_cli_user_collection, &cli, false);
           argx_type(x, str("user/id"));
+    x=argx_init(arg_opt(arg), 'c', str("categories"), str("search: categories"));
+      g=argx_flag(x);
+        x=argx_init(g, 0, str("general"), str(""));
+          argx_flag_set(x, &cli.search.categories.general, 0);
+        x=argx_init(g, 0, str("anime"), str(""));
+          argx_flag_set(x, &cli.search.categories.anime, 0);
+        x=argx_init(g, 0, str("people"), str(""));
+          argx_flag_set(x, &cli.search.categories.people, 0);
+    x=argx_init(arg_opt(arg), 'p', str("purity"), str("search: purity"));
+      g=argx_flag(x);
+        x=argx_init(g, 0, str("sfw"), str(""));
+          argx_flag_set(x, &cli.search.purity.sfw, 0);
+        x=argx_init(g, 0, str("sketchy"), str(""));
+          argx_flag_set(x, &cli.search.purity.sketchy, 0);
+        x=argx_init(g, 0, str("nsfw"), str("requires API key"));
+          argx_flag_set(x, &cli.search.purity.nsfw, 0);
+    x=argx_init(arg_opt(arg), 's', str("sorting"), str("search: sorting"));
+      g=argx_opt(x, (int *)&cli.search.sorting, 0);
+        x=argx_init(g, 0, str("date_added"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_DATE_ADDED);
+        x=argx_init(g, 0, str("relevance"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_RELEVANCE);
+        x=argx_init(g, 0, str("random"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_RANDOM);
+        x=argx_init(g, 0, str("views"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_VIEWS);
+        x=argx_init(g, 0, str("favorites"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_FAVORITES);
+        x=argx_init(g, 0, str("toplist"), str(""));
+          argx_opt_enum(x, WHVN_SORTING_TOPLIST);
+    x=argx_init(arg_opt(arg), 'o', str("order"), str("search: order"));
+      g=argx_opt(x, (int *)&cli.search.order, 0);
+        x=argx_init(g, 0, str("asc"), str(""));
+          argx_opt_enum(x, WHVN_ORDER_ASC);
+        x=argx_init(g, 0, str("desc"), str(""));
+          argx_opt_enum(x, WHVN_ORDER_DESC);
+    x=argx_init(arg_opt(arg), 't', str("toplist-range"), str("search: toplist range"));
+      g=argx_opt(x, (int *)&cli.search.toplist_range, 0);
+        x=argx_init(g, 0, str("1d"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1D);
+        x=argx_init(g, 0, str("3d"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_3D);
+        x=argx_init(g, 0, str("1w"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1W);
+        x=argx_init(g, 0, str("1M"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1M);
+        x=argx_init(g, 0, str("3M"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_3M);
+        x=argx_init(g, 0, str("6M"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_6M);
+        x=argx_init(g, 0, str("1y"), str(""));
+          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1Y);
+    x=argx_init(arg_opt(arg), 'i', str("page"), str("search: page"));
+      argx_int(x, (int *)&cli.search.page, 0);
+    x=argx_init(arg_opt(arg), 'r', str("seed"), str("search: seed"));
+      argx_str(x, &cli.search.seed, 0);
 
     //whvn_api_wallpaper_info(&cli.api, STR("vpmexp"), &cli.info);
     //whvn_collection_add(&cli.coll, &cli.info);

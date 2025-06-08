@@ -9,7 +9,7 @@ typedef struct WhvnTag {
     Str alias;
     unsigned long category_id;
     Str category;
-    WhvnPurityFlag purity;
+    WhvnPurity purity;
     Str created_at;
 } WhvnTag, *WhvnTags;
 

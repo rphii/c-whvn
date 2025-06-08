@@ -9,19 +9,21 @@
 #include "whvn-resolution.h"
 
 typedef struct WhvnApiSearch {
-    Str query;
-    WhvnCategoryFlag categories;
-    WhvnPurityFlag purity;
-    WhvnSortingList sorting;
-    WhvnOrderList order;
-    WhvnToplistRangeList toplist_range;
-    WhvnResolution atleast;
-    WhvnResolutions resolutions;
-    WhvnResolutions ratios;
-    Color color;
-    unsigned long page;
-    Str seed;
+    Str                     query;
+    WhvnCategory            categories;
+    WhvnPurity              purity;
+    WhvnSortingList         sorting;
+    WhvnOrderList           order;
+    WhvnToplistRangeList    toplist_range;
+    WhvnResolution          atleast;
+    WhvnResolutions         resolutions;
+    WhvnResolutions         ratios;
+    Color                   color;
+    unsigned long           page;
+    Str                     seed;
 } WhvnApiSearch;
+
+void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg);
 
 #define WHVN_API_SEARCH_H
 #endif

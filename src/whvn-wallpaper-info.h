@@ -18,8 +18,8 @@ typedef struct WhvnWallpaperInfo {
     unsigned long       views;
     unsigned long       favorites;
     Str                 source;
-    WhvnPurityFlag      purity;
-    WhvnCategoryFlag    category;
+    WhvnPurity          purity;
+    WhvnCategory        category;
     unsigned long       dimension_x;
     unsigned long       dimension_y;
     Str                 resolution;

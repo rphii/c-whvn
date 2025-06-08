@@ -69,10 +69,7 @@ ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, WhvnResponse *response
     } else {
         str_extend(&url, str("?"));
     }
-    if(str_len(arg->query)) {
-        str_extend(&url, str("q="));
-        str_fmt_websafe(&url, arg->query);
-    }
+    whvn_api_search_fmt_websafe(&url, arg);
     Str api_response = whvn_api_curl_do(api, url);
     json_parse(str_trim(api_response), whvn_json_parse_response, response);
 clean:
