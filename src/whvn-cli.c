@@ -130,6 +130,15 @@ error:
     return -1;
 }
 
+int whvn_cli_check_apikey_present(WhvnCli *cli) {
+    if(!str_len(cli->api.key)) {
+        THROW("require API key");
+    }
+    return 0;
+error:
+    return -1;
+}
+
 int main(int argc, const char **argv) {
     int err = 0;
 
@@ -189,6 +198,7 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.search.purity.sketchy, 0);
         x=argx_init(g, 0, str("nsfw"), str("requires API key"));
           argx_flag_set(x, &cli.search.purity.nsfw, 0);
+          argx_func(x, 1, whvn_cli_check_apikey_present, &cli, false);
     x=argx_init(arg_opt(arg), 's', str("sorting"), str("search: sorting"));
       g=argx_opt(x, (int *)&cli.search.sorting, 0);
         x=argx_init(g, 0, str("date_added"), str(""));
