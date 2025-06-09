@@ -21,10 +21,6 @@ typedef struct WhvnApi {
         bool            initialized;
         Str             websafe_url;
     } curl;
-    WhvnWallpaperInfo   wallpaper_info;
-    WhvnCollection      collection;
-    WhvnTags            tags;
-    WhvnUserSettings    user_settings;
     /* TODO : time information to not hit API rate limit */
 } WhvnApi;
 
