@@ -5,7 +5,7 @@
 void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
     Str color_s = STR_DYN();
     const char *purity_fmt = info.purity.nsfw ? FG_RD_B BOLD : info.purity.sketchy ? FG_YL_B BOLD : FG_GN_B BOLD;
-    printf(F("%6zu", FG_BK_B) " " F("wallhaven-", IT) FS_BEG FS_FMT FS_END F("%.*s", IT) " " F("%.*s", UL FG_BL) " ",
+    printf(F("%6zu", FG_BK_B) " " F("wallhaven-", IT) FS_BEG FS_FMT FS_END F("%.*s", IT) " " F("%.*s", UL FG_BL_B) " ",
             index, purity_fmt, STR_F(info.id), STR_F(str_get_ext(info.path)), STR_F(info.url));
     for(size_t j = 0; j < array_len(info.colors); ++j) {
         Color color = array_at(info.colors, j);
@@ -14,7 +14,12 @@ void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
         color_fmt_rgb_fmt(&color_s, color, str("  "));
         printf("%.*s", STR_F(color_s));
     }
+    printf(" ");
+    if(info.category.general) printf(F("G", BOLD FG_MG_B));
+    if(info.category.anime) printf(F("A", BOLD FG_MG_B));
+    if(info.category.people) printf(F("P", BOLD FG_MG_B));
     printf(" " F("󰣐 %lu", FG_RD_B) "", info.favorites);
+    printf(" " F(" %lu", FG_CY_B) "", info.views);
     printf("\n");
     str_free(&color_s);
 }
