@@ -83,14 +83,14 @@ Example doing a search:
         /* ... configure search ... */
     };
     int result = whvn_api_search(&api, &search, &buf, &response);
-    /* ...
-       do something with 'response'
-       ... */
+    if(!result) {
+        /* ...
+        do something with 'response'
+        ... */
+    }
     whvn_response_free(&response); /* see chapter: ### memory freeing */
     str_free(&buf);
-    return 0;
-error:
-    return -1;
+    return result;
 ```
 
 ### memory freeing
