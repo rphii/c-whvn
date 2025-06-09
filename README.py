@@ -8,7 +8,7 @@ if result.returncode == 0:
 else:
     exit(1)
 
-base=f"""# whvn
+base=f"""# c-whvn
 
 Wallhaven API library and cli
 

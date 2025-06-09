@@ -1,4 +1,4 @@
-# whvn
+# c-whvn
 
 Wallhaven API library and cli
 
