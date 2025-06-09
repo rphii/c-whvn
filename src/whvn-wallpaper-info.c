@@ -55,52 +55,63 @@ void whvn_wallpaper_info_print(WhvnWallpaperInfo *wp) {
 
 void whvn_wallpaper_info_fmt(Str *out, const char fmt, WhvnWallpaperInfo *wp) {
     /*
-id : str
-url : str
-short_url : str
-avatar.200 : str
-avatar.128 : str
-avatar.32 : str
-avatar.20 : str
-uploader.username : str
-uploader.group : str
-uploader.avatar.200 : str
-uploader.avatar.128 : str
-uploader.avatar.32 : str
-uploader.avatar.20 : str
-views : int
-favorites : int
-source : str
-purity.sfw : bool
-purity.sketchy : bool
-purity.nsfw : bool
-category.general : bool
-category.anime : bool
-category.people : bool
-dimension.x : int
-dimension.y : int
-resolution.w : int
-resolution.h : int
-ratio.w : int
-ratio.h : int
-file_size : int
-file_type : str
-created_at : str
-colors : color[]
-path : str
-thumbs.large : str
-thumbs.original : str
-thumbs.small : str
-tags : tags[]
-tags[].id : int
-tags[].name : str
-tags[].alias : str
-tags[].category_id : int
-tags[].category : str
-tags[].purity.sfw : bool
-tags[].purity.sketchy : bool
-tags[].purity.nsfw : bool
-tags[].created_at : str
-    */
+%i  id : str
+%u  url : str
+%U  short_url : str
+%0  avatar.200 : str
+%8  avatar.128 : str
+%3  avatar.32 : str
+%2  avatar.20 : str
+%@n uploader.username : str
+%@g uploader.group : str
+%@0 uploader.avatar.200 : str
+%@8 uploader.avatar.128 : str
+%@3 uploader.avatar.32 : str
+%@2 uploader.avatar.20 : str
+%v  views : int
+%f  favorites : int
+%s  source : str
+%p  purity : str
+%ps purity.sfw : bool
+%py purity.sketchy : bool
+%pn purity.nsfw : bool
+%c  category : str
+%cg category.general : bool
+%ca category.anime : bool
+%cp category.people : bool
+%x  dimension.x : int
+%y  dimension.y : int
+%rw resolution.w : int
+%rh resolution.h : int
+%Rw ratio.w : int
+%Rh ratio.h : int
+%S  file_size : int
+%T  file_type : str
+%d  created_at : str
+%C[..]  colors : color[]
+   %r   red : 02x
+   %g   green : 02x
+   %b   blue 02x
+   %R   red : %u
+   %G   green : %u
+   %B   blue : %u
+%p  path : str
+%#l thumbs.large : str
+%#o thumbs.original : str
+%#s thumbs.small : str
+%t[..]  tags : tags[]
+   %i   tags[].id : int
+   %n   tags[].name : str
+   %a   tags[].alias : str
+   %I   tags[].category_id : int
+   %c   tags[].category : str
+   %p   tags[].purity : str
+   %ps  tags[].purity.sfw : bool
+   %py  tags[].purity.sketchy : bool
+   %pn  tags[].purity.nsfw : bool
+   %d   tags[].created_at : str
+
+format structs!? a thing's fmt can be overridden by another ones?
+*/
 }
 
