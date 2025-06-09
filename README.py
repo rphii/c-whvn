@@ -87,6 +87,16 @@ error:
 
 From everything discussed so far, the following needs to be freed if you're done with everything:
 
+```c
+whvn_wallpaper_info_free(&info);
+whvn_response_free(&response);
+whvn_user_settings_free(&settings);
+array_free(collections);
+
+whvn_api_free(&api);
+str_free(&buf);
+```
+
 **!!! IMPORTANT !!!** >>> do NOT free your `buf` until you're done with any of
 the results mentioned in [api functions](#api-functions). The `buf` is the API
 answer in plaintext JSON format (albeit unusable - it will be a garbage JSON
@@ -97,16 +107,6 @@ data as efficiently as possible, so we don't want to allocate dynamic memory
 when we don't have to - and one such case is any `Str` within the resulting
 structures, because they are all just - fixed (un-escpated) - references to the
 response string.
-
-```c
-whvn_wallpaper_info_free(&info);
-whvn_response_free(&response);
-whvn_user_settings_free(&settings);
-array_free(collections);
-
-whvn_api_free(&api);
-str_free(&buf);
-```
 
 """
 
