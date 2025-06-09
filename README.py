@@ -87,14 +87,16 @@ error:
 
 From everything discussed so far, the following needs to be freed if you're done with everything:
 
-**!!! IMPORTANT !!!** >>> do NOT free your `buf` until you're done with any of the
-results mentioned in [api functions](#api-functions). The `buf` is a direct API
-answer in plaintext JSON format - the described api functions merely construct
-the URL and use libCURL to get and convert said raw string into the appropriate
-structs. My aim is to handle data as efficiently as possible, so I don't want
-to allocate dynamic memory when I don't have to - and one such case is any
-`Str` within the resulting structures, because they are all just references to
-the raw response string.
+**!!! IMPORTANT !!!** >>> do NOT free your `buf` until you're done with any of
+the results mentioned in [api functions](#api-functions). The `buf` is the API
+answer in plaintext JSON format (albeit unusable - it will be a garbage JSON
+string, since it gets modified, to fix strings; e.g. escaping characters) - the
+described api functions merely construct the URL and use libCURL to get and
+convert said raw string into the appropriate structs. `whvn`'s aim is to handle
+data as efficiently as possible, so we don't want to allocate dynamic memory
+when we don't have to - and one such case is any `Str` within the resulting
+structures, because they are all just - fixed (un-escpated) - references to the
+response string.
 
 ```c
 whvn_wallpaper_info_free(&info);
