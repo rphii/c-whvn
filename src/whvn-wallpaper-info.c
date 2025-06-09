@@ -53,4 +53,54 @@ void whvn_wallpaper_info_print(WhvnWallpaperInfo *wp) {
     str_free(&color_s);
 }
 
+void whvn_wallpaper_info_fmt(Str *out, const char fmt, WhvnWallpaperInfo *wp) {
+    /*
+id : str
+url : str
+short_url : str
+avatar.200 : str
+avatar.128 : str
+avatar.32 : str
+avatar.20 : str
+uploader.username : str
+uploader.group : str
+uploader.avatar.200 : str
+uploader.avatar.128 : str
+uploader.avatar.32 : str
+uploader.avatar.20 : str
+views : int
+favorites : int
+source : str
+purity.sfw : bool
+purity.sketchy : bool
+purity.nsfw : bool
+category.general : bool
+category.anime : bool
+category.people : bool
+dimension.x : int
+dimension.y : int
+resolution.w : int
+resolution.h : int
+ratio.w : int
+ratio.h : int
+file_size : int
+file_type : str
+created_at : str
+colors : color[]
+path : str
+thumbs.large : str
+thumbs.original : str
+thumbs.small : str
+tags : tags[]
+tags[].id : int
+tags[].name : str
+tags[].alias : str
+tags[].category_id : int
+tags[].category : str
+tags[].purity.sfw : bool
+tags[].purity.sketchy : bool
+tags[].purity.nsfw : bool
+tags[].created_at : str
+    */
+}
 
