@@ -81,10 +81,10 @@ void whvn_wallpaper_info_fmt(Str *out, const char fmt, WhvnWallpaperInfo *wp) {
 %cp category.people : bool
 %x  dimension.x : int
 %y  dimension.y : int
-%rw resolution.w : int
-%rh resolution.h : int
-%Rw ratio.w : int
-%Rh ratio.h : int
+%w  resolution.w : int
+%h  resolution.h : int
+%W  ratio.w : int
+%H  ratio.h : int
 %S  file_size : int
 %T  file_type : str
 %d  created_at : str
@@ -96,9 +96,9 @@ void whvn_wallpaper_info_fmt(Str *out, const char fmt, WhvnWallpaperInfo *wp) {
    %G   green : %u
    %B   blue : %u
 %p  path : str
-%#l thumbs.large : str
-%#o thumbs.original : str
-%#s thumbs.small : str
+%@l thumbs.large : str
+%@o thumbs.original : str
+%@s thumbs.small : str
 %t[..]  tags : tags[]
    %i   tags[].id : int
    %n   tags[].name : str
