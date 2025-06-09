@@ -87,7 +87,7 @@ error:
 
 From everything discussed so far, the following needs to be freed if you're done with everything:
 
-!!! IMPORTANT !!! >>> do NOT free your `buf` until you're done with any of the
+**!!! IMPORTANT !!!** >>> do NOT free your `buf` until you're done with any of the
 results mentioned in [api functions](#api-functions). The `buf` is a direct API
 answer in plaintext JSON format - the described api functions merely construct
 the URL and use libCURL to get and convert said raw string into the appropriate
