@@ -11,5 +11,6 @@ src/build
 *.cache
 *.*_old
 *.out
+*.pyre
 apikey
 
