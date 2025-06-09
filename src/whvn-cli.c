@@ -58,7 +58,7 @@ int whvn_cli_tag_info(WhvnCli *cli) {
 int whvn_cli_user_settings(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserSettings settings = {0};
-    int result = whvn_api_user_settings(&cli->api, str(""), &cli->api_buf, &settings);
+    int result = whvn_api_user_settings(&cli->api, &cli->api_buf, &settings);
     if(cli->print_pretty) {
         printf("thumb_size: %.*s\n", STR_F(settings.thumb_size));
         printf("per_page: %zu\n", settings.per_page);
@@ -90,7 +90,7 @@ int whvn_cli_user_settings(WhvnCli *cli) {
 int whvn_cli_user_collections(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserCollections collections = {0};
-    int result = whvn_api_user_collections(&cli->api, cli->query.user_collection, &cli->api_buf, &collections);
+    int result = whvn_api_user_collections(&cli->api, cli->search.page, &cli->api_buf, &collections);
     if(cli->print_pretty) {
         for(size_t i = 0; i < array_len(collections); ++i) {
             WhvnUserCollection collection = array_at(collections, i);
@@ -104,7 +104,15 @@ int whvn_cli_user_collections(WhvnCli *cli) {
 int whvn_cli_user_collection(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnResponse response = {0};
-    int result = whvn_api_user_collection(&cli->api, cli->query.user_collection, &cli->api_buf, &response);
+    Str username = {0};
+    size_t id = 0, i = 0;
+    for(Str splice = {0}; str_splice(cli->query.user_collection, &splice, '/'); ++i) {
+        if(i > 1) THROW("invalid argument: %.*s", STR_F(cli->query.user_collection));
+        else if(i == 0) username = splice;
+        else if(i == 1) if(str_as_size(splice, &id, 10)) THROW("invalid ID: %.*s", STR_F(splice));
+    }
+    if(i < 2) THROW("missing ID");
+    int result = whvn_api_user_collection(&cli->api, cli->search.page, username, id, &cli->api_buf, &response);
     if(cli->print_pretty) {
         for(size_t i = 0; i < array_len(response.data); ++i) {
             WhvnWallpaperInfo info = array_at(response.data, i);
@@ -113,6 +121,8 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     }
     whvn_response_free(&response);
     return result;
+error:
+    return -1;
 }
 
 int main(int argc, const char **argv) {
