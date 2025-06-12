@@ -143,7 +143,10 @@ int main(int argc, const char **argv) {
     int err = 0;
 
     WhvnCli cli = {0};
-    WhvnCli def = { .api.url = str("https://wallhaven.cc/api/v1/") };
+    WhvnCli def = {
+        .api.url = str("https://wallhaven.cc/api/v1/"),
+        .print_pretty = true,
+    };
     cli.arg = arg_new();
     struct Arg *arg = cli.arg;
     arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
@@ -155,14 +158,14 @@ int main(int argc, const char **argv) {
       argx_help(x, arg);
     x=argx_init(arg_opt(arg), 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
+    x=argx_init(arg_opt(arg), 'R', str("pretty"), str("display pretty result"));
+      argx_flag_set(x, &cli.print_pretty, &def.print_pretty);
     x=argx_init(arg_opt(arg), 'P', str("print"), str("print the raw API response"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("url"), str("print the raw API URL"));
           argx_flag_set(x, &cli.api.print_url, 0);
         x=argx_init(g, 0, str("response"), str("print the raw API response"));
           argx_flag_set(x, &cli.api.print_response, 0);
-        x=argx_init(g, 0, str("pretty"), str("print the pretty output"));
-          argx_flag_set(x, &cli.print_pretty, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
