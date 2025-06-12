@@ -30,7 +30,8 @@ Usage:
 Options:
   -h  --help <arg>                            display this help
   -U  --url <string>                          api URL =https://wallhaven.cc/api/v1/
-  -P  --print <url|response|pretty>           print the raw API response
+  -R  --pretty <bool>                         display pretty result =true
+  -P  --print <url|response>                  print the raw API response
   -c  --categories <general|anime|people>     search: categories
   -p  --purity <sfw|sketchy|nsfw>             search: purity
   -s  --sorting <date_added|relevance|random|views|favorites|toplist> 
