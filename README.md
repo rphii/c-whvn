@@ -32,6 +32,7 @@ Options:
   -U  --url <string>                          api URL =https://wallhaven.cc/api/v1/
   -R  --pretty <bool>                         display pretty result =true
   -P  --print <url|response>                  print the raw API response
+  -n  --max <int>                             number of maximum results =0
   -c  --categories <general|anime|people>     search: categories
   -p  --purity <sfw|sketchy|nsfw>             search: purity
   -s  --sorting <date_added|relevance|random|views|favorites|toplist> 
