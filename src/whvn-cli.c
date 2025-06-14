@@ -30,7 +30,7 @@ int whvn_cli_wallpaper_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnWallpaperInfo info = {0};
     int result = whvn_api_wallpaper_info(&cli->api, cli->query.wallpaper_info, &cli->api_buf, &info);
-    if(cli->print_pretty) {
+    if(cli->action.print_pretty) {
         whvn_cli_wallpaper_info_print(info, 0);
     }
     whvn_wallpaper_info_free(&info);
@@ -43,19 +43,27 @@ int whvn_cli_search(WhvnCli *cli) {
     size_t n = 0;
     WhvnResponse response = {0};
     WhvnApiSearch search = cli->search;
+    Str out = {0};
     do {
         str_clear(&cli->api_buf);
         result = whvn_api_search(&cli->api, &search, &cli->api_buf, &response);
-        if(cli->print_pretty) {
-            for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
+        for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
+            WhvnWallpaperInfo info = array_at(response.data, i);
+            if(cli->action.print_pretty) {
                 if(cli->max && n >= cli->max) break;
-                WhvnWallpaperInfo info = array_at(response.data, i);
                 whvn_cli_wallpaper_info_print(info, n);
+            }
+            if(cli->action.open_browser) {
+                usleep(WHVN_API_RATE_US);
+                str_clear(&out);
+                str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
+                system(out.str);
             }
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
     } while(!result && (cli->max ? n < cli->max : false));
+    str_free(&out);
     return result;
 }
 
@@ -63,7 +71,7 @@ int whvn_cli_tag_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnTag tag_info = {0};
     int result = whvn_api_tag_info(&cli->api, cli->query.tag_info, &cli->api_buf, &tag_info);
-    if(cli->print_pretty) {
+    if(cli->action.print_pretty) {
         printf("%6lu %.*s (%.*s) - %zu \"%.*s\" %.*s - %.*s\n", tag_info.id, STR_F(tag_info.name), STR_F(tag_info.alias),
                 tag_info.category_id, STR_F(tag_info.category), STR_F(whvn_purity_str(tag_info.purity)), STR_F(tag_info.created_at));
     }
@@ -74,7 +82,7 @@ int whvn_cli_user_settings(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserSettings settings = {0};
     int result = whvn_api_user_settings(&cli->api, &cli->api_buf, &settings);
-    if(cli->print_pretty) {
+    if(cli->action.print_pretty) {
         printf("thumb_size: %.*s\n", STR_F(settings.thumb_size));
         printf("per_page: %zu\n", settings.per_page);
         printf("purity: %.*s\n", STR_F(whvn_purity_str(settings.purity)));
@@ -106,7 +114,7 @@ int whvn_cli_user_collections(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnUserCollections collections = {0};
     int result = whvn_api_user_collections(&cli->api, cli->search.page, &cli->api_buf, &collections);
-    if(cli->print_pretty) {
+    if(cli->action.print_pretty) {
         for(size_t i = 0; i < array_len(collections); ++i) {
             WhvnUserCollection collection = array_at(collections, i);
             printf("%6zu %.*s %zux (%s)\n", collection.id, STR_F(collection.label), collection.count, collection.is_public ? "public" : "private");
@@ -130,19 +138,27 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     int result = 0;
     WhvnApiSearch search = cli->search;
     size_t n = 0;
+    Str out = {0};
     do {
         str_clear(&cli->api_buf);
         result = whvn_api_user_collection(&cli->api, search.page, username, id, &cli->api_buf, &response);
-        if(cli->print_pretty) {
-            for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
-                if(cli->max && n >= cli->max) break;
-                WhvnWallpaperInfo info = array_at(response.data, i);
+        for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
+            WhvnWallpaperInfo info = array_at(response.data, i);
+            if(cli->max && n >= cli->max) break;
+            if(cli->action.print_pretty) {
                 whvn_cli_wallpaper_info_print(info, n);
+            }
+            if(cli->action.open_browser) {
+                usleep(WHVN_API_RATE_US);
+                str_clear(&out);
+                str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
+                system(out.str);
             }
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
     } while(!result && (cli->max ? n < cli->max : false));
+    str_free(&out);
     return result;
 error:
     return -1;
@@ -163,7 +179,7 @@ int main(int argc, const char **argv) {
     WhvnCli cli = {0};
     WhvnCli def = {
         .api.url = str("https://wallhaven.cc/api/v1/"),
-        .print_pretty = true,
+        .action.print_pretty = true,
     };
     cli.arg = arg_new();
     struct Arg *arg = cli.arg;
@@ -176,8 +192,6 @@ int main(int argc, const char **argv) {
       argx_help(x, arg);
     x=argx_init(arg_opt(arg), 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
-    x=argx_init(arg_opt(arg), 'R', str("pretty"), str("display pretty result"));
-      argx_bool(x, &cli.print_pretty, &def.print_pretty);
     x=argx_init(arg_opt(arg), 'P', str("print"), str("print the raw API response"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("url"), str("print the raw API URL"));
@@ -186,6 +200,12 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.api.print_response, 0);
     x=argx_init(arg_opt(arg), 'n', str("max"), str("number of maximum results"));
       argx_ssz(x, &cli.max, 0);
+    x=argx_init(arg_opt(arg), 'a', str("action"), str("what to do with results"));
+      g=argx_flag(x);
+        x=argx_init(g, 0, str("pretty"), str(""));
+          argx_flag_set(x, &cli.action.print_pretty, &def.action.print_pretty);
+        x=argx_init(g, 0, str("browser"), str(""));
+          argx_flag_set(x, &cli.action.open_browser, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));

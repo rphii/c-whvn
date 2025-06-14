@@ -13,7 +13,10 @@ typedef struct WhvnCli {
         Str tag_info;
         Str user_collection;
     } query;
-    bool print_pretty;
+    struct {
+        bool print_pretty;
+        bool open_browser;
+    } action;
     ssize_t max;
 } WhvnCli;
 
