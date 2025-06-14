@@ -59,6 +59,7 @@ int whvn_cli_search(WhvnCli *cli) {
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
             }
+            ++search.page;
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
@@ -154,6 +155,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
             }
+            ++search.page;
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
