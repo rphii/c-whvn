@@ -62,7 +62,7 @@ int whvn_cli_search(WhvnCli *cli) {
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
-        ++search.page;
+        search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : false));
     str_free(&out);
     return result;
@@ -158,7 +158,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
         }
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
-        ++search.page;
+        search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : false));
     str_free(&out);
     return result;
