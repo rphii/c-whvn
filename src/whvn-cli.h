@@ -14,6 +14,7 @@ typedef struct WhvnCli {
         Str user_collection;
     } query;
     bool print_pretty;
+    ssize_t max;
 } WhvnCli;
 
 #define WHVN_CLI_H

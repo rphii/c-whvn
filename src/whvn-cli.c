@@ -1,6 +1,8 @@
 #include <rphii/arg.h>
 #include "whvn-cli.h"
+#include "whvn-api-search.h"
 #include "whvn-purity.h"
+#include <unistd.h>
 
 void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
     Str color_s = STR_DYN();
@@ -37,15 +39,23 @@ int whvn_cli_wallpaper_info(WhvnCli *cli) {
 
 int whvn_cli_search(WhvnCli *cli) {
     ASSERT_ARG(cli);
+    int result = 0;
+    size_t n = 0;
     WhvnResponse response = {0};
-    int result = whvn_api_search(&cli->api, &cli->search, &cli->api_buf, &response);
-    if(cli->print_pretty) {
-        for(size_t i = 0; i < array_len(response.data); ++i) {
-            WhvnWallpaperInfo info = array_at(response.data, i);
-            whvn_cli_wallpaper_info_print(info, i);
+    WhvnApiSearch search = cli->search;
+    do {
+        str_clear(&cli->api_buf);
+        result = whvn_api_search(&cli->api, &search, &cli->api_buf, &response);
+        if(cli->print_pretty) {
+            for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
+                if(cli->max && n >= cli->max) break;
+                WhvnWallpaperInfo info = array_at(response.data, i);
+                whvn_cli_wallpaper_info_print(info, n);
+            }
         }
-    }
-    whvn_response_free(&response);
+        whvn_response_free(&response);
+        usleep(WHVN_API_RATE_US);
+    } while(!result && (cli->max ? n < cli->max : false));
     return result;
 }
 
@@ -117,14 +127,22 @@ int whvn_cli_user_collection(WhvnCli *cli) {
         else if(i == 1) if(str_as_size(splice, &id, 10)) THROW("invalid ID: %.*s", STR_F(splice));
     }
     if(i < 2) THROW("missing ID");
-    int result = whvn_api_user_collection(&cli->api, cli->search.page, username, id, &cli->api_buf, &response);
-    if(cli->print_pretty) {
-        for(size_t i = 0; i < array_len(response.data); ++i) {
-            WhvnWallpaperInfo info = array_at(response.data, i);
-            whvn_cli_wallpaper_info_print(info, i);
+    int result = 0;
+    WhvnApiSearch search = cli->search;
+    size_t n = 0;
+    do {
+        str_clear(&cli->api_buf);
+        result = whvn_api_user_collection(&cli->api, search.page, username, id, &cli->api_buf, &response);
+        if(cli->print_pretty) {
+            for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
+                if(cli->max && n >= cli->max) break;
+                WhvnWallpaperInfo info = array_at(response.data, i);
+                whvn_cli_wallpaper_info_print(info, n);
+            }
         }
-    }
-    whvn_response_free(&response);
+        whvn_response_free(&response);
+        usleep(WHVN_API_RATE_US);
+    } while(!result && (cli->max ? n < cli->max : false));
     return result;
 error:
     return -1;
@@ -166,6 +184,8 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.api.print_url, 0);
         x=argx_init(g, 0, str("response"), str("print the raw API response"));
           argx_flag_set(x, &cli.api.print_response, 0);
+    x=argx_init(arg_opt(arg), 'n', str("max"), str("number of maximum results"));
+      argx_ssz(x, &cli.max, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
