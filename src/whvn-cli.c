@@ -49,8 +49,8 @@ int whvn_cli_search(WhvnCli *cli) {
         result = whvn_api_search(&cli->api, &search, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
+            if(cli->max && n >= cli->max) break;
             if(cli->action.print_pretty) {
-                if(cli->max && n >= cli->max) break;
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.open_browser) {
