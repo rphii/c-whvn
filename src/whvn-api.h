@@ -12,7 +12,7 @@
 
 #if defined(WHVN_API_V1)
 
-#define WHVN_API_RATE_US   1333333
+#define WHVN_API_RATE_US   1450000
 
 typedef struct WhvnApi {
     Str                 url;
