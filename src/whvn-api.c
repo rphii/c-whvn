@@ -37,7 +37,7 @@ error:
 int whvn_api_key_extend(Str *out, WhvnApi *api) {
     ASSERT_ARG(out);
     ASSERT_ARG(api);
-    if(str_len(api->key)) {
+    if(str_len_raw(api->key)) {
         str_extend(out, str("?apikey="));
         str_extend(out, api->key);
         return true;

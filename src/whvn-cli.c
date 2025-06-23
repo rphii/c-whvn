@@ -167,7 +167,7 @@ error:
 }
 
 int whvn_cli_check_apikey_present(WhvnCli *cli) {
-    if(!str_len(cli->api.key)) {
+    if(!str_len_raw(cli->api.key)) {
         THROW("require API key");
     }
     return 0;

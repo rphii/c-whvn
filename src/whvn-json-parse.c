@@ -200,7 +200,7 @@ void *whvn_json_parse_user_settings_categories(void **user, JsonParseValue key, 
 
 void *whvn_json_parse_user_settings_stringvec(void **user, JsonParseValue key, JsonParseValue *val) {
     if(!val) return 0;
-    if(!str_len(val->s)) return 0;
+    if(!str_len_raw(val->s)) return 0;
     VStr *vec = *(VStr **)user;
     size_t len = array_len(*vec);
     array_resize(*vec, len + 1);
