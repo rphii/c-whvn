@@ -4,6 +4,11 @@
 #include "whvn-purity.h"
 #include <unistd.h>
 
+static void wait_user(void) {
+    printf(F("Press ENTER to continue ", IT FG_BK_B));
+    getchar();
+}
+
 void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
     Str color_s = STR_DYN();
     const char *purity_fmt = info.purity.nsfw ? FG_RD_B BOLD : info.purity.sketchy ? FG_YL_B BOLD : FG_GN_B BOLD;
@@ -58,6 +63,7 @@ int whvn_cli_search(WhvnCli *cli) {
                 str_clear(&out);
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
+                if(cli->action.wait_user) wait_user();
             }
         }
         whvn_response_free(&response);
@@ -154,6 +160,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
                 str_clear(&out);
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
+                if(cli->action.wait_user) wait_user();
             }
         }
         whvn_response_free(&response);
@@ -208,6 +215,8 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.action.print_pretty, &def.action.print_pretty);
         x=argx_init(g, 0, str("browser"), str(""));
           argx_flag_set(x, &cli.action.open_browser, 0);
+        x=argx_init(g, 0, str("wait"), str(""));
+          argx_flag_set(x, &cli.action.wait_user, 0);
     x=argx_pos(arg, str("api-call"), str("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
@@ -286,6 +295,10 @@ int main(int argc, const char **argv) {
       argx_str(x, &cli.search.seed, 0);
 
     argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), &cli.api.key, 0, true);
+
+    arg_config_file(cli.arg, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
+    arg_config_file(cli.arg, str("$HOME/.config/whvn/whvn.conf"));
+    arg_config_file(cli.arg, str("/etc/whvn/whvn.conf"));
 
     bool quit_early = false;
     TRYC(arg_parse(arg, argc, argv, &quit_early));

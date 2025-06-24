@@ -16,6 +16,7 @@ typedef struct WhvnCli {
     struct {
         bool print_pretty;
         bool open_browser;
+        bool wait_user;
     } action;
     ssize_t max;
 } WhvnCli;
