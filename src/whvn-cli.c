@@ -55,15 +55,17 @@ int whvn_cli_search(WhvnCli *cli) {
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
             if(cli->max && n >= cli->max) break;
+            if(cli->action.open_browser) {
+                usleep(WHVN_API_RATE_US);
+                if(i && cli->action.wait_user) wait_user();
+            }
             if(cli->action.print_pretty) {
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.open_browser) {
-                usleep(WHVN_API_RATE_US);
                 str_clear(&out);
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
-                if(cli->action.wait_user) wait_user();
             }
         }
         whvn_response_free(&response);
@@ -152,15 +154,17 @@ int whvn_cli_user_collection(WhvnCli *cli) {
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
             if(cli->max && n >= cli->max) break;
+            if(cli->action.open_browser) {
+                usleep(WHVN_API_RATE_US);
+                if(i && cli->action.wait_user) wait_user();
+            }
             if(cli->action.print_pretty) {
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.open_browser) {
-                usleep(WHVN_API_RATE_US);
                 str_clear(&out);
                 str_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", STR_F(info.url));
                 system(out.str);
-                if(cli->action.wait_user) wait_user();
             }
         }
         whvn_response_free(&response);
