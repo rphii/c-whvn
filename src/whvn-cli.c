@@ -298,7 +298,8 @@ int main(int argc, const char **argv) {
     x=argx_init(arg_opt(arg), 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
 
-    argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), &cli.api.key, 0, true);
+    x=argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), true);
+      argx_str(x, &cli.api.key, 0);
 
     arg_config_file(cli.arg, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
     arg_config_file(cli.arg, str("$HOME/.config/whvn/whvn.conf"));
