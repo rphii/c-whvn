@@ -199,6 +199,7 @@ int main(int argc, const char **argv) {
     arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
     arg_init_width(cli.arg, 100, 45);
     argx_builtin_opt_help(cli.arg);
+    argx_builtin_env_compgen(cli.arg);
 
     struct ArgX *x = 0;
     struct ArgXGroup *g = 0;
