@@ -198,11 +198,10 @@ int main(int argc, const char **argv) {
     struct Arg *arg = cli.arg;
     arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
     arg_init_width(cli.arg, 100, 45);
+    argx_builtin_opt_help(cli.arg);
 
     struct ArgX *x = 0;
     struct ArgXGroup *g = 0;
-    x=argx_init(arg_opt(arg), 'h', str("help"), str("display this help"));
-      argx_help(x, arg);
     x=argx_init(arg_opt(arg), 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
     x=argx_init(arg_opt(arg), 'P', str("print"), str("print the raw API response"));
