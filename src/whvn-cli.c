@@ -202,7 +202,7 @@ int main(int argc, const char **argv) {
 
     struct ArgX *x = 0;
     struct ArgXGroup *o = 0, *g = 0;
-    o=argx_group(arg, str("Options"));
+    o=argx_group(arg, str("Options"), false);
     argx_builtin_opt_help(o);
     argx_builtin_opt_source(o, str("/etc/whvn/whvn.conf"));
     argx_builtin_opt_source(o, str("$HOME/.config/rphiic/colors.conf"));
@@ -303,12 +303,12 @@ int main(int argc, const char **argv) {
     x=argx_init(o, 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
 
-    o=argx_group(arg, str("Environment Variables"));
+    o=argx_group(arg, str("Environment Variables"), false);
     x=argx_env(o, str("WHVN_API_KEY"), str("your API key"), true);
     argx_builtin_env_compgen(o);
       argx_str(x, &cli.api.key, 0);
 
-    o=argx_group(arg, str("Color Adjustments"));
+    o=argx_group(arg, str("Color Adjustments"), true);
     argx_builtin_opt_rice(o);
  
 
