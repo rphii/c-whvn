@@ -198,22 +198,23 @@ int main(int argc, const char **argv) {
     struct Arg *arg = cli.arg;
     arg_init(arg, str("whvn-cli"), str("wallhaven API cli"), str(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
     arg_init_width(cli.arg, 100, 45);
-    argx_builtin_opt_help(cli.arg);
-    argx_builtin_env_compgen(cli.arg);
+    arg_init_fmt(cli.arg);
 
     struct ArgX *x = 0;
-    struct ArgXGroup *g = 0;
-    x=argx_init(arg_opt(arg), 'U', str("url"), str("api URL"));
+    struct ArgXGroup *o = 0, *g = 0;
+    o=argx_group(arg, str("Options"));
+    argx_builtin_opt_help(o);
+    x=argx_init(o, 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
-    x=argx_init(arg_opt(arg), 'P', str("print"), str("print the raw API response"));
+    x=argx_init(o, 'P', str("print"), str("print the raw API response"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("url"), str("print the raw API URL"));
           argx_flag_set(x, &cli.api.print_url, 0);
         x=argx_init(g, 0, str("response"), str("print the raw API response"));
           argx_flag_set(x, &cli.api.print_response, 0);
-    x=argx_init(arg_opt(arg), 'n', str("max"), str("number of maximum results"));
+    x=argx_init(o, 'n', str("max"), str("number of maximum results"));
       argx_ssz(x, &cli.max, 0);
-    x=argx_init(arg_opt(arg), 'a', str("action"), str("what to do with results"));
+    x=argx_init(o, 'a', str("action"), str("what to do with results"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("pretty"), str(""));
           argx_flag_set(x, &cli.action.print_pretty, &def.action.print_pretty);
@@ -240,7 +241,7 @@ int main(int argc, const char **argv) {
           argx_str(x, &cli.query.user_collection, 0);
           argx_func(x, 2, whvn_cli_user_collection, &cli, false);
           argx_type(x, str("user/id"));
-    x=argx_init(arg_opt(arg), 'c', str("categories"), str("search: categories"));
+    x=argx_init(o, 'c', str("categories"), str("search: categories"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("general"), str(""));
           argx_flag_set(x, &cli.search.categories.general, 0);
@@ -248,7 +249,7 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.search.categories.anime, 0);
         x=argx_init(g, 0, str("people"), str(""));
           argx_flag_set(x, &cli.search.categories.people, 0);
-    x=argx_init(arg_opt(arg), 'p', str("purity"), str("search: purity"));
+    x=argx_init(o, 'p', str("purity"), str("search: purity"));
       g=argx_flag(x);
         x=argx_init(g, 0, str("sfw"), str(""));
           argx_flag_set(x, &cli.search.purity.sfw, 0);
@@ -257,7 +258,7 @@ int main(int argc, const char **argv) {
         x=argx_init(g, 0, str("nsfw"), str("requires API key"));
           argx_flag_set(x, &cli.search.purity.nsfw, 0);
           argx_func(x, 1, whvn_cli_check_apikey_present, &cli, false);
-    x=argx_init(arg_opt(arg), 's', str("sorting"), str("search: sorting"));
+    x=argx_init(o, 's', str("sorting"), str("search: sorting"));
       g=argx_opt(x, (int *)&cli.search.sorting, 0);
         x=argx_init(g, 0, str("date_added"), str(""));
           argx_opt_enum(x, WHVN_SORTING_DATE_ADDED);
@@ -271,13 +272,13 @@ int main(int argc, const char **argv) {
           argx_opt_enum(x, WHVN_SORTING_FAVORITES);
         x=argx_init(g, 0, str("toplist"), str(""));
           argx_opt_enum(x, WHVN_SORTING_TOPLIST);
-    x=argx_init(arg_opt(arg), 'o', str("order"), str("search: order"));
+    x=argx_init(o, 'o', str("order"), str("search: order"));
       g=argx_opt(x, (int *)&cli.search.order, 0);
         x=argx_init(g, 0, str("asc"), str(""));
           argx_opt_enum(x, WHVN_ORDER_ASC);
         x=argx_init(g, 0, str("desc"), str(""));
           argx_opt_enum(x, WHVN_ORDER_DESC);
-    x=argx_init(arg_opt(arg), 't', str("toplist-range"), str("search: toplist range"));
+    x=argx_init(o, 't', str("toplist-range"), str("search: toplist range"));
       g=argx_opt(x, (int *)&cli.search.toplist_range, 0);
         x=argx_init(g, 0, str("1d"), str(""));
           argx_opt_enum(x, WHVN_TOPLIST_RANGE_1D);
@@ -293,13 +294,18 @@ int main(int argc, const char **argv) {
           argx_opt_enum(x, WHVN_TOPLIST_RANGE_6M);
         x=argx_init(g, 0, str("1y"), str(""));
           argx_opt_enum(x, WHVN_TOPLIST_RANGE_1Y);
-    x=argx_init(arg_opt(arg), 'i', str("page"), str("search: page"));
+    x=argx_init(o, 'i', str("page"), str("search: page"));
       argx_int(x, (int *)&cli.search.page, 0);
-    x=argx_init(arg_opt(arg), 'r', str("seed"), str("search: seed"));
+    x=argx_init(o, 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
 
-    x=argx_env(cli.arg, str("WHVN_API_KEY"), str("your API key"), true);
+    o=argx_group(arg, str("Environment Variables"));
+    x=argx_env(o, str("WHVN_API_KEY"), str("your API key"), true);
+    argx_builtin_env_compgen(o);
       argx_str(x, &cli.api.key, 0);
+
+    o=argx_group(arg, str("Color Adjustments"));
+    argx_builtin_opt_rice(o, arg);
 
     arg_config_file(cli.arg, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
     arg_config_file(cli.arg, str("$HOME/.config/whvn/whvn.conf"));
