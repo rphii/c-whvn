@@ -204,9 +204,10 @@ int main(int argc, const char **argv) {
     struct ArgXGroup *o = 0, *g = 0;
     o=argx_group(arg, str("Options"));
     argx_builtin_opt_help(o);
-    argx_builtin_opt_source(o, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
-    argx_builtin_opt_source(o, str("$HOME/.config/whvn/whvn.conf"));
     argx_builtin_opt_source(o, str("/etc/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, str("$HOME/.config/rphiic/colors.conf"));
+    argx_builtin_opt_source(o, str("$HOME/.config/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
     x=argx_init(o, 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
     x=argx_init(o, 'P', str("print"), str("print the raw API response"));
