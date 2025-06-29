@@ -204,6 +204,9 @@ int main(int argc, const char **argv) {
     struct ArgXGroup *o = 0, *g = 0;
     o=argx_group(arg, str("Options"));
     argx_builtin_opt_help(o);
+    argx_builtin_opt_source(o, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, str("$HOME/.config/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, str("/etc/whvn/whvn.conf"));
     x=argx_init(o, 'U', str("url"), str("api URL"));
       argx_str(x, &cli.api.url, &def.api.url);
     x=argx_init(o, 'P', str("print"), str("print the raw API response"));
@@ -305,11 +308,8 @@ int main(int argc, const char **argv) {
       argx_str(x, &cli.api.key, 0);
 
     o=argx_group(arg, str("Color Adjustments"));
-    argx_builtin_opt_rice(o, arg);
-
-    arg_config_file(cli.arg, str("$XDG_CONFIG_HOME/whvn/whvn.conf"));
-    arg_config_file(cli.arg, str("$HOME/.config/whvn/whvn.conf"));
-    arg_config_file(cli.arg, str("/etc/whvn/whvn.conf"));
+    argx_builtin_opt_rice(o);
+ 
 
     bool quit_early = false;
     TRYC(arg_parse(arg, argc, argv, &quit_early));
