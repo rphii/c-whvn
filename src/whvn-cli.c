@@ -231,7 +231,15 @@ int main(int argc, const char **argv) {
         x=argx_init(g, 0, str("wallpaper-info"), str("get wallpaper info"));
           argx_str(x, &cli.query.wallpaper_info, 0);
           argx_func(x, 2, whvn_cli_wallpaper_info, &cli, false, false);
-        x=argx_init(g, 0, str("search"), str("search wallpapers"));
+        x=argx_init(g, 0, str("search"), str("search wallpapers\n"
+            "tagname - search fuzzily for a tag/keyword\n"
+            "-tagname - exclude a tag/keyword\n"
+            "+tag1 +tag2 - must have tag1 and tag2\n"
+            "+tag1 -tag2 - must have tag1 and NOT tag2\n"
+            "@username - user uploads\n"
+            "id:123 - Exact tag search (can not be combined)\n"
+            "type:{png/jpg} - Search for file type (jpg = jpeg)\n"
+            "like:wallpaper ID - Find wallpapers with similar tags"));
           argx_str(x, &cli.search.query, 0);
           argx_func(x, 2, whvn_cli_search, &cli, false, false);
         x=argx_init(g, 0, str("tag-info"), str("get wallpaper tag info"));
