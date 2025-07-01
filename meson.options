@@ -1,0 +1,7 @@
+
+option('completion_dir',
+  type: 'string',
+  value: '/usr/share/bash-completion/completions/',
+  description: 'Completion directory')
+
+
