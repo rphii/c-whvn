@@ -1,4 +1,4 @@
 # completion function for whvn-cli
-_completion_loader _complete_rphiic
-complete -F _complete_rphiic whvn-cli
+_completion_loader rphiic
+complete -o bashdefault -o default -F _complete_rphiic whvn-cli
 
