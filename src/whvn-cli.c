@@ -261,7 +261,7 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.search.purity.sketchy, 0);
         x=argx_init(g, 0, str("nsfw"), str("requires API key"));
           argx_flag_set(x, &cli.search.purity.nsfw, 0);
-          argx_func(x, 1, whvn_cli_check_apikey_present, &cli, false);
+          argx_func(x, 1, whvn_cli_check_apikey_present, &cli, true, false);
     x=argx_init(o, 's', str("sorting"), str("search: sorting"));
       g=argx_opt(x, (int *)&cli.search.sorting, 0);
         x=argx_init(g, 0, str("date_added"), str(""));
