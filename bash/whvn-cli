@@ -1,0 +1,4 @@
+# completion function for whvn-cli
+_completion_loader _complete_rphiic
+complete -F _complete_rphiic whvn-cli
+
