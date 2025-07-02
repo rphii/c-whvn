@@ -51,9 +51,10 @@ ErrDecl whvn_api_wallpaper_info(WhvnApi *api, Str arg, Str *buf, WhvnWallpaperIn
     str_fmt(&url, "%.*s/w/", STR_F(str_ensure_dir(api->url)));
     str_extend(&url, arg);
     whvn_api_key_extend(&url, api);
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnWallpaperInfo result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_data_wallpaper_info, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_data_wallpaper_info, &result));
     *info = result;
 clean:
     str_free(&url);
@@ -72,9 +73,10 @@ ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, Str *buf, WhvnResponse
         str_extend(&url, str("?"));
     }
     whvn_api_search_fmt_websafe(&url, arg);
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnResponse result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_response, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_response, &result));
     *response = result;
 clean:
     str_free(&url);
@@ -89,9 +91,10 @@ ErrDecl whvn_api_tag_info(WhvnApi *api, Str arg, Str *buf, WhvnTag *tag_info) {
     str_fmt(&url, "%.*s/tag/", STR_F(str_ensure_dir(api->url)));
     str_extend(&url, arg);
     whvn_api_key_extend(&url, api);
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnTag result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_data_tag_info, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_data_tag_info, &result));
     *tag_info = result;
 clean:
     str_free(&url);
@@ -105,9 +108,10 @@ ErrDecl whvn_api_user_settings(WhvnApi *api, Str *buf, WhvnUserSettings *setting
     Str url = STR_DYN();
     str_fmt(&url, "%.*s/settings/", STR_F(str_ensure_dir(api->url)));
     if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnUserSettings result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_data_user_settings, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_data_user_settings, &result));
     *settings = result;
 clean:
     str_free(&url);
@@ -122,9 +126,10 @@ ErrDecl whvn_api_user_collections(WhvnApi *api, size_t page, Str *buf, WhvnUserC
     str_fmt(&url, "%.*s/collections/", STR_F(str_ensure_dir(api->url)));
     if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
     if(page > 0) str_fmt(&url, "&page=%zu", page);
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnUserCollections result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_data_user_collections, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_data_user_collections, &result));
     *collections = result;
 clean:
     str_free(&url);
@@ -139,9 +144,10 @@ ErrDecl whvn_api_user_collection(WhvnApi *api, size_t page, Str username, unsign
     str_fmt(&url, "%.*s/collections/%.*s/%lu", STR_F(str_ensure_dir(api->url)), STR_F(username), id);
     if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
     if(page > 0) str_fmt(&url, "&page=%zu", page);
+    size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnResponse result = {0};
-    TRYC(json_parse(str_trim(*buf), whvn_json_parse_response, &result));
+    TRYC(json_parse(str_trim(str_i0(*buf, i0)), whvn_json_parse_response, &result));
     *response = result;
 clean:
     str_free(&url);
