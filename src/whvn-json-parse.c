@@ -80,7 +80,9 @@ void *whvn_json_parse_avatar(void **user, JsonParseValue key, JsonParseValue *va
     if(!str_cmp(key.s, str("32px"))) json_fix_str(&avatar->px32, v.s);
     if(!str_cmp(key.s, str("20px"))) json_fix_str(&avatar->px20, v.s);
     return 0;
-} void *whvn_json_parse_uploader(void **user, JsonParseValue key, JsonParseValue *val) {
+}
+
+void *whvn_json_parse_uploader(void **user, JsonParseValue key, JsonParseValue *val) {
     JsonParseValue v = val ? *val : (JsonParseValue){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_str(key)), STR_F(json_parse_value_str(v)));
     WhvnUploader *uploader = *(WhvnUploader **)user;
