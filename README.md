@@ -47,6 +47,14 @@ https://github.com/rphii/c-whvn
 
 ```
 
+### example configuration file
+
+```
+action = pretty,browser,wait
+categories = general,anime,people
+sorting = favorites
+```
+
 ## usage as library
 
 ### example code (cli tool)
