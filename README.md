@@ -10,7 +10,7 @@ Wallhaven API library and cli
 ## install
 
 ```sh
-https://github.com/rphii/c-whvn && cd c-whvn
+git clone https://github.com/rphii/c-whvn && cd c-whvn
 meson setup build
 meson install -C build
 ```
