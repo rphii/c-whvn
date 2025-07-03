@@ -1,13 +1,15 @@
-# c-whvn
+# ✨ c-whvn
 
 Wallhaven API library and cli
 
-## dependencies
+![](assets/example.png)
+
+## 📦 dependencies
 
 - [libcurl](https://curl.haxx.se/)
 - [rphiic](https://github.com/rphii/rphiic)
 
-## install
+## ⬇️ install
 
 ```sh
 git clone https://github.com/rphii/c-whvn && cd c-whvn
@@ -19,35 +21,44 @@ installation comes with:
 - whvn-cli : executable
 - libwhvn.\{so,dll,etc\} : library
 
-## whvn-cli
+## 💻 whvn-cli
 
 ```c
 whvn-cli: wallhaven API cli
 Usage:
-  build/src/whvn-cli api-call [options]
-      api-call <wallpaper-info|search|tag-info|user-settings|user-collections|user-collection> 
-          select api call
+  whvn-cli api-call
+      api-call <wallpaper-info|search|tag-info|user-settings|user-collections|user-colle
+        ction>                                select api call
 Options:
-  -h  --help <arg>                            display this help
+  -h  --help <arg>                            print this help
+      --source <string-vec>                   source other config files =[
+          /etc/whvn/whvn.conf,
+          $HOME/.config/rphiic/colors.conf,
+          $HOME/.config/whvn/whvn.conf,
+          $XDG_CONFIG_HOME/whvn/whvn.conf,
+          $HOME/.config/rphiic/pastel2.conf]
+      --try-opt <args>                        try parsing an option, especially useful f
+          or within sources, to suppress errors
   -U  --url <string>                          api URL =https://wallhaven.cc/api/v1/
   -P  --print <url|response>                  print the raw API response
   -n  --max <int>                             number of maximum results =0
-  -a  --action <pretty|browser>               what to do with results
+  -a  --action <pretty|browser|wait>          what to do with results
   -c  --categories <general|anime|people>     search: categories
   -p  --purity <sfw|sketchy|nsfw>             search: purity
-  -s  --sorting <date_added|relevance|random|views|favorites|toplist> 
-          search: sorting
+  -s  --sorting <date_added|relevance|random|views|favorites|toplist>
+          search: sorting                     
   -o  --order <asc|desc>                      search: order
   -t  --toplist-range <1d|3d|1w|1M|3M|6M|1y>  search: toplist range
   -i  --page <int>                            search: page =0
-  -r  --seed <string>                         search: seed 
+  -r  --seed <string>                         search: seed
 Environment Variables:
-  WHVN_API_KEY                                your API key 
+  WHVN_API_KEY <string>                       your API key
+  COMPGEN_WORDLIST <bool>                     Generate input for autocompletion =false
+Color Adjustments: --help 'Color Adjustments'
 https://github.com/rphii/c-whvn
-
 ```
 
-### example configuration file
+### ⚙️ example configuration file
 
 ```
 action = pretty,browser,wait
@@ -55,7 +66,7 @@ categories = general,anime,people
 sorting = favorites
 ```
 
-## usage as library
+## 📚 usage as library
 
 ### example code (cli tool)
 
