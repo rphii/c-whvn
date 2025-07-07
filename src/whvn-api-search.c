@@ -55,16 +55,20 @@ void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg) {
             default: break;
         }
     }
-    if(arg->atleast.w || arg->atleast.h) {
+    if(whvn_resolution_is_valid(arg->atleast)) {
         if(str_len_raw(*out) > len) str_push(out, '&');
-        str_fmt(out, "atleast=%ux%u", arg->atleast.w, arg->atleast.h);
+        str_extend(out, str("atleast="));
+        whvn_resolution_fmt(out, arg->atleast);
     }
-    for(size_t i = 0; i < array_len(arg->ratios); ++i) {
-        if(!i) {
-            if(str_len_raw(*out) > len) str_push(out, '&');
-            str_extend(out, str("ratios="));
-        }
+    if(array_len(arg->ratios)) {
+        if(str_len_raw(*out) > len) str_push(out, '&');
+        str_extend(out, str("ratios="));
         whvn_ratios_fmt(out, arg->ratios);
+    }
+    if(array_len(arg->resolutions)) {
+        if(str_len_raw(*out) > len) str_push(out, '&');
+        str_extend(out, str("resolutions="));
+        whvn_resolutions_fmt(out, arg->resolutions);
     }
     if(arg->page > 0) {
         if(str_len_raw(*out) > len) str_push(out, '&');
@@ -79,6 +83,7 @@ void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg) {
 void whvn_api_search_free(WhvnApiSearch *arg) {
     ASSERT_ARG(arg);
     array_free(arg->resolutions);
+    array_free(arg->ratios);
     memset(arg, 0, sizeof(*arg));
 }
 

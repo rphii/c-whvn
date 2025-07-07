@@ -187,7 +187,7 @@ error:
 }
 
 int cli_ratio(WhvnCli *cli) {
-    Str recent = array_at(cli->vbuf, array_len(cli->vbuf) - 1);
+    Str recent = array_at(cli->vbuf_ratios, array_len(cli->vbuf_ratios) - 1);
     WhvnRatio ratio = whvn_ratio_parse(recent);
     if((ratio.h && ratio.w) || ratio.type != WHVN_RATIO) {
         array_push(cli->search.ratios, ratio);
@@ -196,6 +196,29 @@ int cli_ratio(WhvnCli *cli) {
     THROW_PRINT("invalid ratio format: %.*s\n", STR_F(recent));
     return -1;
 }
+
+int cli_atleast(WhvnCli *cli) {
+    Str recent = cli->buf_atleast;
+    WhvnResolution res = whvn_resolution_parse(recent);
+    if(whvn_resolution_is_valid(res)) {
+        cli->search.atleast = res;
+        return 0;
+    }
+    THROW_PRINT("invalid resolution format: %.*s\n", STR_F(recent));
+    return -1;
+}
+
+int cli_resolution(WhvnCli *cli) {
+    Str recent = array_at(cli->vbuf_resolutions, array_len(cli->vbuf_resolutions) - 1);
+    WhvnResolution res = whvn_resolution_parse(recent);
+    if(whvn_resolution_is_valid(res)) {
+        array_push(cli->search.resolutions, res);
+        return 0;
+    }
+    THROW_PRINT("invalid resolution format: %.*s\n", STR_F(recent));
+    return -1;
+}
+
 
 int main(int argc, const char **argv) {
     int err = 0;
@@ -322,9 +345,20 @@ int main(int argc, const char **argv) {
     x=argx_init(o, 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
     x=argx_init(o, 'R', str("ratios"), str("search: ratios\n"
-                "e.g.: '1080x1920', 'landscape' or 'portrait'"));
-      argx_vstr(x, &cli.vbuf, 0);
-      argx_func(x, 0, &cli_ratio, &cli, true, false);
+                "e.g.: '1920x1080', 'landscape' or 'portrait'"));
+      argx_vstr(x, &cli.vbuf_ratios, 0);
+      argx_type(x, str("ratios"));
+      argx_func(x, 0, &cli_ratio, &cli, false, false);
+    x=argx_init(o, 'A', str("atleast"), str("search: atleast\n"
+                "e.g.: '1920x1080'"));
+      argx_str(x, &cli.buf_atleast, 0);
+      argx_type(x, str("resolution"));
+      argx_func(x, 0, &cli_atleast, &cli, false, false);
+    x=argx_init(o, 'Z', str("resolutions"), str("search: resolutions\n"
+                "e.g.: '1920x1080'"));
+      argx_vstr(x, &cli.vbuf_resolutions, 0);
+      argx_type(x, str("resolutions"));
+      argx_func(x, 0, &cli_resolution, &cli, false, false);
 
     o=argx_group(arg, str("Environment Variables"), false);
     x=argx_env(o, str("WHVN_API_KEY"), str("your API key"), true);

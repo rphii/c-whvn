@@ -7,7 +7,9 @@ typedef struct WhvnCli {
     struct Arg *arg;
     WhvnApi api;
     Str api_buf;
-    VStr vbuf;
+    VStr vbuf_ratios;
+    Str buf_atleast;
+    VStr vbuf_resolutions;
     WhvnApiSearch search;
     struct {
         Str wallpaper_info;

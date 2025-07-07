@@ -125,6 +125,7 @@ whvn_user_settings_free(&settings);
 array_free(collections);
 
 whvn_api_free(&api);
+whvn_api_search_free(&search);
 str_free(&buf);
 ```
 
