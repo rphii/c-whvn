@@ -10,6 +10,7 @@ whvn_lib_headers = [
   'whvn-meta.h',
   'whvn-order.h',
   'whvn-purity.h',
+  'whvn-ratio.h',
   'whvn-resolution.h',
   'whvn-response.h',
   'whvn-sorting.h',
@@ -20,7 +21,6 @@ whvn_lib_headers = [
   'whvn-user-collection.h',
   'whvn-user-settings.h',
   'whvn-wallpaper-info.h',
-  'whvn-ratio.h',
   ]
 
 whvn_lib_src = [
@@ -30,13 +30,13 @@ whvn_lib_src = [
   'whvn-collection.c',
   'whvn-json-parse.c',
   'whvn-purity.c',
+  'whvn-ratio.c',
+  'whvn-resolution.c',
   'whvn-response.c',
   'whvn-tag.c',
   'whvn-toplist-range.c',
   'whvn-user-settings.c',
   'whvn-wallpaper-info.c',
-  'whvn-ratio.c',
-  'whvn-resolution.c',
   ]
 
 whvn_cli_src = [
