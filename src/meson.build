@@ -36,6 +36,7 @@ whvn_lib_src = [
   'whvn-user-settings.c',
   'whvn-wallpaper-info.c',
   'whvn-ratio.c',
+  'whvn-resolution.c',
   ]
 
 whvn_cli_src = [

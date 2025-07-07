@@ -29,3 +29,16 @@ WhvnResolution whvn_resolution_from_str(Str s) {
     return result;
 }
 
+WhvnResolution whvn_resolution_parse(Str str) {
+    Str h, w = str_split_ch(str, 'x', &h);
+    if(!h.len) {
+        return (WhvnResolution){0};
+    }
+    WhvnResolution result = {0};
+    int err = 0;
+    err |= str_as_int(h, (int *)&result.h, 10);
+    err |= str_as_int(w, (int *)&result.w, 10);
+    if(err) return (WhvnResolution){0};
+    return result;
+}
+
