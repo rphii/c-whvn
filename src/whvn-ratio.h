@@ -19,6 +19,7 @@ typedef struct WhvnRatio {
 
 void whvn_ratio_fmt(Str *out, WhvnRatio ratio);
 void whvn_ratios_fmt(Str *out, WhvnRatios ratio);
+WhvnRatio whvn_ratio_parse(Str str);
 
 #define WHVN_RATIO_H
 #endif

@@ -186,6 +186,17 @@ error:
     return -1;
 }
 
+int cli_ratio(WhvnCli *cli) {
+    Str recent = array_at(cli->vbuf, array_len(cli->vbuf) - 1);
+    WhvnRatio ratio = whvn_ratio_parse(recent);
+    if((ratio.h && ratio.w) || ratio.type != WHVN_RATIO) {
+        array_push(cli->search.ratios, ratio);
+        return 0;
+    }
+    THROW_PRINT("invalid ratio format: %.*s\n", STR_F(recent));
+    return -1;
+}
+
 int main(int argc, const char **argv) {
     int err = 0;
 
@@ -310,6 +321,10 @@ int main(int argc, const char **argv) {
       argx_int(x, (int *)&cli.search.page, 0);
     x=argx_init(o, 'r', str("seed"), str("search: seed"));
       argx_str(x, &cli.search.seed, 0);
+    x=argx_init(o, 'R', str("ratios"), str("search: ratios\n"
+                "e.g.: '1080x1920', 'landscape' or 'portrait'"));
+      argx_vstr(x, &cli.vbuf, 0);
+      argx_func(x, 0, &cli_ratio, &cli, true, false);
 
     o=argx_group(arg, str("Environment Variables"), false);
     x=argx_env(o, str("WHVN_API_KEY"), str("your API key"), true);
@@ -324,6 +339,7 @@ int main(int argc, const char **argv) {
     TRYC(arg_parse(arg, argc, argv, &quit_early));
 
 clean:
+    whvn_api_search_free(&cli.search);
     whvn_api_free(&cli.api);
     str_free(&cli.api_buf);
     arg_free(&cli.arg);

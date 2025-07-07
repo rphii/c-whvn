@@ -20,6 +20,7 @@ whvn_lib_headers = [
   'whvn-user-collection.h',
   'whvn-user-settings.h',
   'whvn-wallpaper-info.h',
+  'whvn-ratio.h',
   ]
 
 whvn_lib_src = [
@@ -34,6 +35,7 @@ whvn_lib_src = [
   'whvn-toplist-range.c',
   'whvn-user-settings.c',
   'whvn-wallpaper-info.c',
+  'whvn-ratio.c',
   ]
 
 whvn_cli_src = [

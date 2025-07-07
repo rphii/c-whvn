@@ -7,6 +7,7 @@
 #include "whvn-order.h"
 #include "whvn-toplist-range.h"
 #include "whvn-resolution.h"
+#include "whvn-ratio.h"
 
 typedef struct WhvnApiSearch {
     Str                     query;
@@ -17,13 +18,14 @@ typedef struct WhvnApiSearch {
     WhvnToplistRangeList    toplist_range;
     WhvnResolution          atleast;
     WhvnResolutions         resolutions;
-    WhvnResolutions         ratios;
+    WhvnRatios              ratios;
     Color                   color;
     unsigned long           page;
     Str                     seed;
 } WhvnApiSearch;
 
 void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg);
+void whvn_api_search_free(WhvnApiSearch *arg);
 
 #define WHVN_API_SEARCH_H
 #endif
