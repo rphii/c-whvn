@@ -24,3 +24,17 @@ void whvn_ratios_fmt(Str *out, WhvnRatios ratios) {
     }
 }
 
+WhvnRatio whvn_ratio_parse(Str str) {
+    Str h, w = str_split_ch(str, 'x', &h);
+    if(!h.len) {
+        if(!str_cmp(str, str("landscape"))) return (WhvnRatio){ .type = WHVN_RATIO_LANDSCAPE };
+        if(!str_cmp(str, str("portrait"))) return (WhvnRatio){ .type = WHVN_RATIO_PORTRAIT };
+    }
+    WhvnRatio result = {0};
+    int err = 0;
+    err |= str_as_int(h, (int *)&result.h, 10);
+    err |= str_as_int(w, (int *)&result.w, 10);
+    if(err) return (WhvnRatio){0};
+    return result;
+}
+

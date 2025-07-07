@@ -64,8 +64,7 @@ void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg) {
             if(str_len_raw(*out) > len) str_push(out, '&');
             str_extend(out, str("ratios="));
         }
-        WhvnResolution ratio = array_at(arg->ratios, i);
-        str_fmt(out, "%s%ux%u", i ? "," : "", ratio.w, ratio.h);
+        whvn_ratios_fmt(out, arg->ratios);
     }
     if(arg->page > 0) {
         if(str_len_raw(*out) > len) str_push(out, '&');
@@ -75,5 +74,11 @@ void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg) {
         if(str_len_raw(*out) > len) str_push(out, '&');
         str_fmt(out, "seed=%.*s", STR_F(arg->seed));
     }
+}
+
+void whvn_api_search_free(WhvnApiSearch *arg) {
+    ASSERT_ARG(arg);
+    array_free(arg->resolutions);
+    memset(arg, 0, sizeof(*arg));
 }
 
