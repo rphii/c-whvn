@@ -13,4 +13,6 @@ src/build
 *.out
 *.pyre
 apikey
+subprojects/*
+!subprojects/*.wrap
 
