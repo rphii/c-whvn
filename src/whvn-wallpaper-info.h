@@ -1,7 +1,7 @@
 #ifndef WHVN_WALLPAPER_INFO_H
 
-#include <rphii/str.h>
-#include <rphii/color.h>
+#include <rlso.h>
+#include <rlc/color.h>
 #include "whvn-avatar.h"
 #include "whvn-uploader.h"
 #include "whvn-purity.h"
@@ -10,25 +10,25 @@
 #include "whvn-tag.h"
 
 typedef struct WhvnWallpaperInfo {
-    Str                 id;
-    Str                 url;
-    Str                 short_url;
+    So                  id;
+    So                  url;
+    So                  short_url;
     WhvnAvatar          avatar;
     WhvnUploader        uploader;
     unsigned long       views;
     unsigned long       favorites;
-    Str                 source;
+    So                  source;
     WhvnPurity          purity;
     WhvnCategory        category;
     unsigned long       dimension_x;
     unsigned long       dimension_y;
-    Str                 resolution;
-    Str                 ratio;
+    So                  resolution;
+    So                  ratio;
     unsigned long       file_size;
-    Str                 file_type; /*mime?*/
-    Str                 created_at; /*date?*/
+    So                  file_type; /*mime?*/
+    So                  created_at; /*date?*/
     Color               *colors;
-    Str                 path;
+    So                  path;
     WhvnThumbs          thumbs;
     WhvnTags            tags;
 } WhvnWallpaperInfo, *WhvnWallpaperInfos;

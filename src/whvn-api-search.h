@@ -1,6 +1,6 @@
 #ifndef WHVN_API_SEARCH_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 #include "whvn-category.h"
 #include "whvn-purity.h"
 #include "whvn-sorting.h"
@@ -10,7 +10,7 @@
 #include "whvn-ratio.h"
 
 typedef struct WhvnApiSearch {
-    Str                     query;
+    So                      query;
     WhvnCategory            categories;
     WhvnPurity              purity;
     WhvnSortingList         sorting;
@@ -21,10 +21,10 @@ typedef struct WhvnApiSearch {
     WhvnRatios              ratios;
     Color                   color;
     unsigned long           page;
-    Str                     seed;
+    So                      seed;
 } WhvnApiSearch;
 
-void whvn_api_search_fmt_websafe(Str *out, WhvnApiSearch *arg);
+void whvn_api_search_fmt_websafe(So *out, WhvnApiSearch *arg);
 void whvn_api_search_free(WhvnApiSearch *arg);
 
 #define WHVN_API_SEARCH_H

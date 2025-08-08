@@ -1,16 +1,16 @@
 #ifndef WHVN_TAG_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 #include "whvn-purity.h"
 
 typedef struct WhvnTag {
     unsigned long id;
-    Str name;
-    Str alias;
+    So name;
+    So alias;
     unsigned long category_id;
-    Str category;
+    So category;
     WhvnPurity purity;
-    Str created_at;
+    So created_at;
 } WhvnTag, *WhvnTags;
 
 void whvn_tag_free(WhvnTag *tag);

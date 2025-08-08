@@ -1,20 +1,20 @@
 #ifndef WHVN_CLI_H
 
-#include <rphii/arg.h>
+#include <rlarg.h>
 #include "whvn-api.h"
 
 typedef struct WhvnCli {
     struct Arg *arg;
     WhvnApi api;
-    Str api_buf;
-    VStr vbuf_ratios;
-    Str buf_atleast;
-    VStr vbuf_resolutions;
+    So api_buf;
+    VSo vbuf_ratios;
+    So buf_atleast;
+    VSo vbuf_resolutions;
     WhvnApiSearch search;
     struct {
-        Str wallpaper_info;
-        Str tag_info;
-        Str user_collection;
+        So wallpaper_info;
+        So tag_info;
+        So user_collection;
     } query;
     struct {
         bool print_pretty;

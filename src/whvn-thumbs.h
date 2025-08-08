@@ -1,11 +1,11 @@
 #ifndef WHVN_THUMBS_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 
 typedef struct WhvnThumbs {
-    Str large;
-    Str original;
-    Str small;
+    So large;
+    So original;
+    So small;
 } WhvnThumbs;
 
 #define WHVN_THUMBS_H

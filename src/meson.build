@@ -44,21 +44,32 @@ whvn_cli_src = [
   ]
 
 cc = meson.get_compiler('c')
-dep_rphiic = dependency('rphiic', required: true)
-dep_curl = dependency('libcurl', required: true)
-dep_m = cc.find_library('m', required: false)
 
-whvn_lib = library('whvn',
+rljson_dep = dependency('rljson', fallback : ['rljson', 'rljson_dep'], default_options: ['default_library=static'])
+rlarg_dep = dependency('rlarg', fallback : ['rlarg', 'rlarg_dep'], default_options: ['default_library=static'])
+rlso_dep = dependency('rlso', fallback : ['rlso', 'rlso_dep'], default_options: ['default_library=static'])
+rlc_dep = dependency('rlc', fallback : ['rlc', 'rlc_dep'], default_options: ['default_library=static'])
+
+curl_dep = dependency('libcurl', required: true)
+m_dep = cc.find_library('m', required: false)
+
+libwhvn = library('whvn',
   whvn_lib_src,
-  dependencies: [dep_rphiic, dep_curl],
+  dependencies: [rljson_dep, rlso_dep, rlc_dep, curl_dep],
   install: true,
 )
+
+whvn_dep = declare_dependency(
+  link_with: libwhvn,
+  include_directories: '.',
+  )
 
 install_headers(whvn_lib_headers, subdir: 'whvn')
 
 whvn_cli = executable('whvn-cli',
   whvn_cli_src,
-  dependencies: [dep_rphiic, dep_curl],
-  link_with: whvn_lib,
+  dependencies: [rlc_dep, rlarg_dep, rlso_dep, curl_dep],
+  link_with: libwhvn,
   install: true,
 )
+

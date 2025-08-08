@@ -8,9 +8,9 @@ typedef struct WhvnPurity {
     bool nsfw;
 } WhvnPurity;
 
-#include <rphii/str.h>
+#include <rlso.h>
 
-Str whvn_purity_str(WhvnPurity f);
+So whvn_purity_str(WhvnPurity f);
 bool whvn_purity_is_set(WhvnPurity f);
 
 #define WHVN_PURITY_H

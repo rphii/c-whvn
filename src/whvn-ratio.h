@@ -1,6 +1,6 @@
 #ifndef WHVN_RATIO_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 
 typedef enum {
     WHVN_RATIO,
@@ -17,9 +17,9 @@ typedef struct WhvnRatio {
     WhvnRatioList type;
 } WhvnRatio, *WhvnRatios;
 
-void whvn_ratio_fmt(Str *out, WhvnRatio ratio);
-void whvn_ratios_fmt(Str *out, WhvnRatios ratio);
-WhvnRatio whvn_ratio_parse(Str str);
+void whvn_ratio_fmt(So *out, WhvnRatio ratio);
+void whvn_ratios_fmt(So *out, WhvnRatios ratio);
+WhvnRatio whvn_ratio_parse(So str);
 
 #define WHVN_RATIO_H
 #endif

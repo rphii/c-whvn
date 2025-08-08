@@ -1,11 +1,11 @@
 #ifndef WHVN_UPLOADER_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 #include "whvn-avatar.h"
 
 typedef struct WhvnUploader {
-    Str username;
-    Str group;
+    So username;
+    So group;
     WhvnAvatar avatar;
 } WhvnUploader;
 
