@@ -12,9 +12,9 @@ typedef enum {
     WHVN_TOPLIST_RANGE_1Y,
 } WhvnToplistRangeList;
 
-#include <rphii/str.h>
+#include <rlso.h>
 
-Str whvn_toplist_range_str(WhvnToplistRangeList id);
+So whvn_toplist_range_str(WhvnToplistRangeList id);
 
 #define WHVN_TOPLIST_RANGE
 #endif

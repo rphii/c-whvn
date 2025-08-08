@@ -1,7 +1,7 @@
 #include "whvn-collection.h"
-#include <rphii/array.h>
+#include <rlc/array.h>
 
-LUT_IMPLEMENT(TWhvnWallpaperInfo, twhvn_wallpaper_info, Str, BY_REF, WhvnWallpaperInfo, BY_REF, str_hash, str_hcmp, 0, 0);
+LUT_IMPLEMENT(TWhvnWallpaperInfo, twhvn_wallpaper_info, So, BY_REF, WhvnWallpaperInfo, BY_REF, so_hash_p, so_cmp_p, 0, 0);
 
 void whvn_collection_init(WhvnCollection *self) {
     ASSERT_ARG(self);

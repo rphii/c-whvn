@@ -1,9 +1,9 @@
 #ifndef WHVN_COLLECTION
 
-#include <rphii/lut.h>
+#include <rlc/lut.h>
 #include "whvn-wallpaper-info.h"
 
-LUT_INCLUDE(TWhvnWallpaperInfo, twhvn_wallpaper_info, Str, BY_REF, WhvnWallpaperInfo, BY_REF);
+LUT_INCLUDE(TWhvnWallpaperInfo, twhvn_wallpaper_info, So, BY_REF, WhvnWallpaperInfo, BY_REF);
 
 typedef struct WhvnCollection {
     TWhvnWallpaperInfoKV **vec;

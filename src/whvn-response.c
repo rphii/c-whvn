@@ -7,8 +7,8 @@ void whvn_response_free(WhvnResponse *response) {
         whvn_wallpaper_info_free(&info);
     }
     array_free(response->data);
-    str_free(&response->meta.query);
-    str_free(response->meta.seed);
+    so_free(&response->meta.query);
+    so_free(response->meta.seed);
 #ifndef NDEBUG
     memset(response, 0, sizeof(*response));
 #endif

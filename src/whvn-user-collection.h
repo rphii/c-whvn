@@ -1,10 +1,10 @@
 #ifndef WHVN_USER_COLLECTION_H
 
-#include <rphii/str.h>
+#include <rlso.h>
 
 typedef struct WhvnUserCollection {
     unsigned long id;
-    Str label;
+    So label;
     unsigned long views;
     bool is_public;
     unsigned long count;
