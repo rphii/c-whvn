@@ -7,7 +7,10 @@ Wallhaven API library and cli
 ## 📦 dependencies
 
 - [libcurl](https://curl.haxx.se/)
-- [rphiic](https://github.com/rphii/rphiic)
+- [rphii/rlc](https://github.com/rphii/rlc) *(meson wrap provided)*
+- [rphii/rlso](https://github.com/rphii/rlso) *(meson wrap provided)*
+- [rphii/rlarg](https://github.com/rphii/rlarg) *(meson wrap provided)*
+- [rphii/rljson](https://github.com/rphii/rljson) *(meson wrap provided)*
 
 ## ⬇️ install
 
