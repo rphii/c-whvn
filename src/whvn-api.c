@@ -14,12 +14,19 @@ void whvn_api_free(WhvnApi *api) {
     curl_easy_cleanup(api->curl.handle);
 }
 
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) { /*{{{*/
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
+} /*}}}*/
+
 #define ERR_whvn_api_curl_do(...) "curl failed"
 ErrDecl whvn_api_curl_do(WhvnApi *api, So url, So *response) {
     whvn_api_curl_init(api);
+    int err = 0;
     So old = *response;
+    char *curl = so_dup(url);
     curl_easy_setopt(api->curl.handle, CURLOPT_WRITEDATA, response);
-    curl_easy_setopt(api->curl.handle, CURLOPT_URL, url.str);
+    curl_easy_setopt(api->curl.handle, CURLOPT_URL, curl);
     if(api->print_url) {
         so_println(url);
     }
@@ -28,9 +35,11 @@ ErrDecl whvn_api_curl_do(WhvnApi *api, So url, So *response) {
     if(api->print_response) {
         so_println(so_i0(*response, old.len));
     }
-    return 0;
+clean:
+    free(curl);
+    return err;
 error:
-    return -1;
+    ERR_CLEAN;
 }
 
 #define ERR_whvn_api_key_extend(...) "failed getting API key"
@@ -43,6 +52,62 @@ int whvn_api_key_extend(So *out, WhvnApi *api) {
         return true;
     }
     return false;
+}
+
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+
+ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So *buf, So filename) {
+    whvn_api_curl_init(api);
+
+    int err = 0;
+    FILE *fp = 0;
+    So path = info->path;
+    char *curl = so_dup(path);
+
+    So_File_Type_List type = so_file_get_type(filename);
+    if(type == SO_FILE_TYPE_FILE) {
+        size_t size = so_file_get_size(filename);
+        if(size == info->file_size) {
+        //printff(" %.*s -> [%.*s]",SO_F(path),SO_F(filename));
+            return 0;
+        }
+    }
+
+    //printff("  [%.*s] -> [%.*s]",SO_F(path),SO_F(filename));
+
+    usleep(WHVN_API_RATE_US);
+    char cdir[SO_FILE_PATH_MAX];
+    So subdirs = SO;
+    for(So subdir = SO; so_splice(filename, &subdir, PLATFORM_CH_SUBDIR); ) {
+        if(so_is_zero(subdir)) continue;
+        if(so_len(subdirs)) {
+            so_as_cstr(subdirs, cdir, SO_FILE_PATH_MAX);
+            errno = 0;
+            mkdir(cdir, 0700);
+            if(errno && errno != EEXIST) {
+                THROW("failed creating folder: %.*s", SO_F(subdirs));
+            }
+        }
+        so_path_join(&subdirs, subdirs, subdir);
+    }
+
+    fp = so_file_fp(filename, "w");
+    if(!fp) THROW("failed opening file: %.*s", SO_F(filename));
+    curl_easy_setopt(api->curl.handle, CURLOPT_WRITEFUNCTION, (curl_write_callback) write_data);
+    curl_easy_setopt(api->curl.handle, CURLOPT_WRITEDATA, fp);
+    curl_easy_setopt(api->curl.handle, CURLOPT_URL, curl);
+    CURLcode res = curl_easy_perform(api->curl.handle);
+    if(res != CURLE_OK) THROW("could not perform curl, error: %u", res);
+
+clean:
+    fclose(fp);
+    free(curl);
+    so_free(&subdirs);
+    return err;
+error:
+    ERR_CLEAN;
 }
 
 ErrDecl whvn_api_wallpaper_info(WhvnApi *api, So arg, So *buf, WhvnWallpaperInfo *info) {

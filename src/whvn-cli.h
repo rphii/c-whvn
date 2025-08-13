@@ -7,6 +7,7 @@ typedef struct WhvnCli {
     struct Arg *arg;
     WhvnApi api;
     So api_buf;
+    So download_root;
     VSo vbuf_ratios;
     So buf_atleast;
     VSo vbuf_resolutions;
