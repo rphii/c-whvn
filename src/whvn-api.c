@@ -25,6 +25,7 @@ ErrDecl whvn_api_curl_do(WhvnApi *api, So url, So *response) {
     int err = 0;
     So old = *response;
     char *curl = so_dup(url);
+    curl_easy_setopt(api->curl.handle, CURLOPT_WRITEFUNCTION, so_writefunc);
     curl_easy_setopt(api->curl.handle, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(api->curl.handle, CURLOPT_URL, curl);
     if(api->print_url) {
@@ -58,7 +59,7 @@ int whvn_api_key_extend(So *out, WhvnApi *api) {
 #include <unistd.h>
 #include <errno.h>
 
-ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So *buf, So filename) {
+ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So filename) {
     whvn_api_curl_init(api);
 
     int err = 0;

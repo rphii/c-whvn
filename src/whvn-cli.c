@@ -54,7 +54,8 @@ void whvn_cli_download(WhvnCli *cli, So folder, WhvnWallpaperInfo *info) {
     so_path_join(&filename, filename, basename);
     printf("    " F(" ", FG_YL) " %.*s " F("-> %.*s", FG_BK_B IT) "", SO_F(basename), SO_F(folder));
     fflush(stdout);
-    if(whvn_api_download(&cli->api, info, &cli->api_buf, filename)) {
+
+    if(whvn_api_download(&cli->api, info, filename)) {
         printf("\r    " F(" ", FG_RD) " %.*s " F("-> %.*s", FG_BK_B IT) "\n", SO_F(path), SO_F(filename));
     } else {
         printf("\r    " F(" ", FG_GN) "\n");
