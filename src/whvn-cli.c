@@ -43,6 +43,25 @@ int whvn_cli_wallpaper_info(WhvnCli *cli) {
     return result;
 }
 
+#include "whvn-api.h"
+void whvn_cli_download(WhvnCli *cli, So folder, WhvnWallpaperInfo *info) {
+    ASSERT_ARG(cli);
+    ASSERT_ARG(info);
+    So path = info->path;
+    So basename = so_get_nodir(path);
+    So filename = SO;
+    so_path_join(&filename, cli->download_root, folder);
+    so_path_join(&filename, filename, basename);
+    printf("    " F(" ", FG_YL) " %.*s " F("-> %.*s", FG_BK_B IT) "", SO_F(basename), SO_F(folder));
+    fflush(stdout);
+    if(whvn_api_download(&cli->api, info, &cli->api_buf, filename)) {
+        printf("\r    " F(" ", FG_RD) " %.*s " F("-> %.*s", FG_BK_B IT) "\n", SO_F(path), SO_F(filename));
+    } else {
+        printf("\r    " F(" ", FG_GN) "\n");
+    }
+    //usleep(WHVN_API_RATE_US);
+}
+
 int whvn_cli_search(WhvnCli *cli) {
     ASSERT_ARG(cli);
     int result = 0;
@@ -67,6 +86,9 @@ int whvn_cli_search(WhvnCli *cli) {
                 so_clear(&out);
                 so_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", SO_F(info.url));
                 system(out.str);
+            }
+            if(cli->action.download) {
+                whvn_cli_download(cli, so("search"), &info);
             }
         }
         whvn_response_free(&response);
@@ -138,19 +160,47 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnResponse response = {0};
     So username = {0};
+    So base_download = SO;
     size_t id = 0, i = 0;
+    bool valid_id = false;
+    So id_name = SO;
     for(So splice = {0}; so_splice(cli->query.user_collection, &splice, '/'); ++i) {
         if(i > 1) THROW("invalid argument: %.*s", SO_F(cli->query.user_collection));
         else if(i == 0) username = splice;
-        else if(i == 1) if(so_as_size(splice, &id, 10)) THROW("invalid ID: %.*s", SO_F(splice));
+        else if(i == 1) {
+            if(so_as_size(splice, &id, 10)) {
+                id_name = splice;
+            } else {
+                valid_id = true;
+            }
+        }
     }
     if(i < 2) THROW("missing ID");
+    WhvnUserCollections collections = {0};
     int result = 0;
+    result = whvn_api_user_collections(&cli->api, 0, &cli->api_buf, &collections);
+    for(size_t i = 0; i < array_len(collections); ++i) {
+        WhvnUserCollection collection = array_at(collections, i);
+        if(!valid_id) {
+            if(!so_cmp(collection.label, id_name)) {
+                id = collection.id;
+                valid_id = true;
+                break;
+            }
+        } else {
+            if(collection.id == id) {
+                id_name = collection.label;
+            }
+        }
+    }
+    so_path_join(&base_download, username, id_name);
+    //so_clear(&cli->api_buf);
+    if(!valid_id) THROW("invalid id: %.*s", SO_F(id_name));
     WhvnApiSearch search = cli->search;
     size_t n = 0;
     So out = {0};
     do {
-        so_clear(&cli->api_buf);
+        //so_clear(&cli->api_buf);
         result = whvn_api_user_collection(&cli->api, search.page, username, id, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
@@ -166,6 +216,9 @@ int whvn_cli_user_collection(WhvnCli *cli) {
                 so_clear(&out);
                 so_fmt(&out, "xdg-open \"%.*s\" 2>/dev/null &", SO_F(info.url));
                 system(out.str);
+            }
+            if(cli->action.download) {
+                whvn_cli_download(cli, base_download, &info);
             }
         }
         whvn_response_free(&response);
@@ -229,6 +282,7 @@ int main(int argc, const char **argv) {
         .api.url = so("https://wallhaven.cc/api/v1/"),
         .action.print_pretty = true,
     };
+    so_extend_wordexp(&def.download_root, so("$HOME/Downloads/whvn"), false);
     cli.arg = arg_new();
     struct Arg *arg = cli.arg;
     arg_init(arg, so("whvn-cli"), so("wallhaven API cli"), so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
@@ -261,6 +315,10 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.action.open_browser, 0);
         x=argx_init(g, 0, so("wait"), so(""));
           argx_flag_set(x, &cli.action.wait_user, 0);
+        x=argx_init(g, 0, so("download"), so(""));
+          argx_flag_set(x, &cli.action.download, 0);
+    x=argx_init(o, 'C', so("download-root"), so("output root directory for downloads"));
+      argx_str(x, &cli.download_root, &def.download_root);
     x=argx_pos(arg, so("api-call"), so("select api call"));
       g=argx_opt(x, 0, 0);
         x=argx_init(g, 0, so("wallpaper-info"), so("get wallpaper info"));
