@@ -94,7 +94,7 @@ int whvn_cli_search(WhvnCli *cli) {
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
         search.page = search.page ? search.page + 1 : 2;
-    } while(!result && (cli->max ? n < cli->max : false));
+    } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
     return result;
 }
@@ -200,7 +200,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     size_t n = 0;
     So out = {0};
     do {
-        //so_clear(&cli->api_buf);
+        so_clear(&cli->api_buf);
         result = whvn_api_user_collection(&cli->api, search.page, username, id, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
@@ -224,7 +224,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
         whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
         search.page = search.page ? search.page + 1 : 2;
-    } while(!result && (cli->max ? n < cli->max : false));
+    } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
     return result;
 error:
@@ -281,6 +281,7 @@ int main(int argc, const char **argv) {
     WhvnCli def = {
         .api.url = so("https://wallhaven.cc/api/v1/"),
         .action.print_pretty = true,
+        .max = 24,
     };
     so_extend_wordexp(&def.download_root, so("$HOME/Downloads/whvn"), false);
     cli.arg = arg_new();
@@ -306,7 +307,7 @@ int main(int argc, const char **argv) {
         x=argx_init(g, 0, so("response"), so("print the raw API response"));
           argx_flag_set(x, &cli.api.print_response, 0);
     x=argx_init(o, 'n', so("max"), so("number of maximum results"));
-      argx_ssz(x, &cli.max, 0);
+      argx_ssz(x, &cli.max, &def.max);
     x=argx_init(o, 'a', so("action"), so("what to do with results"));
       g=argx_flag(x);
         x=argx_init(g, 0, so("pretty"), so(""));
