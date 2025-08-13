@@ -31,7 +31,7 @@ typedef struct WhvnApi {
 void whvn_api_curl_init(WhvnApi *api);
 void whvn_api_free(WhvnApi *api);
 
-ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So *buf, So filename);
+ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So filename);
 ErrDecl whvn_api_wallpaper_info(WhvnApi *api, So arg, So *buf, WhvnWallpaperInfo *info);
 ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, So *buf, WhvnResponse *response);
 ErrDecl whvn_api_tag_info(WhvnApi *api, So arg, So *buf, WhvnTag *tag_info);
