@@ -204,12 +204,16 @@ error:
     ERR_CLEAN;
 }
 
-ErrDecl whvn_api_user_collection(WhvnApi *api, size_t page, So username, unsigned long id, So *buf, WhvnResponse *response) {
+ErrDecl whvn_api_user_collection(WhvnApi *api, WhvnApiSearch *arg, So username, unsigned long id, So *buf, WhvnResponse *response) {
     int err = 0;
     So url = SO;
     so_fmt(&url, "%.*s/collections/%.*s/%lu", SO_F(so_ensure_dir(api->url)), SO_F(username), id);
-    if(!whvn_api_key_extend(&url, api)) THROW("API key required but not set");
-    if(page > 0) so_fmt(&url, "&page=%zu", page);
+    if(whvn_api_key_extend(&url, api)) {
+        so_extend(&url, so("&"));
+    } else {
+        so_extend(&url, so("?"));
+    }
+    whvn_api_search_fmt_websafe(&url, arg);
     size_t i0 = buf->len;
     TRYC(whvn_api_curl_do(api, url, buf));
     WhvnResponse result = {0};
