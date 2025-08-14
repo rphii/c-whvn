@@ -92,8 +92,9 @@ int whvn_cli_search(WhvnCli *cli) {
                 whvn_cli_download(cli, so("search"), &info);
             }
         }
-        whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
+        if(search.page >= response.meta.last_page) break;
+        whvn_response_free(&response);
         search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
@@ -222,8 +223,9 @@ int whvn_cli_user_collection(WhvnCli *cli) {
                 whvn_cli_download(cli, base_download, &info);
             }
         }
-        whvn_response_free(&response);
         usleep(WHVN_API_RATE_US);
+        if(search.page >= response.meta.last_page) break;
+        whvn_response_free(&response);
         search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
