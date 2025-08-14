@@ -202,7 +202,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     So out = {0};
     do {
         so_clear(&cli->api_buf);
-        result = whvn_api_user_collection(&cli->api, search.page, username, id, &cli->api_buf, &response);
+        result = whvn_api_user_collection(&cli->api, &search, username, id, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
             WhvnWallpaperInfo info = array_at(response.data, i);
             if(cli->max && n >= cli->max) break;

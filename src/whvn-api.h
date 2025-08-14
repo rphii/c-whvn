@@ -37,7 +37,7 @@ ErrDecl whvn_api_search(WhvnApi *api, WhvnApiSearch *arg, So *buf, WhvnResponse 
 ErrDecl whvn_api_tag_info(WhvnApi *api, So arg, So *buf, WhvnTag *tag_info);
 ErrDecl whvn_api_user_settings(WhvnApi *api, So *buf, WhvnUserSettings *settings);
 ErrDecl whvn_api_user_collections(WhvnApi *api, size_t page, So *buf, WhvnUserCollections *collections);
-ErrDecl whvn_api_user_collection(WhvnApi *api, size_t page, So user, unsigned long id, So *buf, WhvnResponse *response);
+ErrDecl whvn_api_user_collection(WhvnApi *api, WhvnApiSearch *arg, So user, unsigned long id, So *buf, WhvnResponse *response);
 #endif /* WHVN_API_V1 */
 
 #define WHVN_API_H
