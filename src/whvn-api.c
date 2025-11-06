@@ -69,10 +69,12 @@ ErrDecl whvn_api_download(WhvnApi *api, WhvnWallpaperInfo *info, So filename) {
 
     So_File_Type_List type = so_file_get_type(filename);
     if(type == SO_FILE_TYPE_FILE) {
-        size_t size = so_file_get_size(filename);
-        if(size == info->file_size) {
-        //printff(" %.*s -> [%.*s]",SO_F(path),SO_F(filename));
-            return 0;
+        size_t size = 0;
+        if(!so_file_get_size(filename, &size)) {
+            if(size == info->file_size) {
+                //printff(" %.*s -> [%.*s]",SO_F(path),SO_F(filename));
+                return 0;
+            }
         }
     }
 
