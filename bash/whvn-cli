@@ -1,4 +1,4 @@
 # generic completion function using rphiic
-_completion_loader rphiic
-complete -o bashdefault -o default -F _complete_rphiic whvn-cli
+_completion_loader rlc
+complete -o bashdefault -o default -F _complete_rlc whvn-cli
 
