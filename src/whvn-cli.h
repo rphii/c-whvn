@@ -19,6 +19,7 @@ typedef struct WhvnCli {
     } query;
     struct {
         bool print_pretty;
+        bool print_tags;
         bool open_browser;
         bool wait_user;
         bool download;
