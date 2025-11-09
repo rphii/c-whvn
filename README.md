@@ -96,7 +96,7 @@ ErrDecl whvn_api_user_collection(WhvnApi *api, size_t page, Str user, unsigned l
 Example doing a search:
 
 ```c
-    Str buf = {0}; /* initialize to 0! - can be re-used for subsequent API function calls */
+    Str buf = {0}; /* initialize to 0! - do not re-use for subsequent API function calls */
     WhvnResponse response = {0}; /* initialize to 0! */
     WhvnApi api = {
         /* ... configure ... */
