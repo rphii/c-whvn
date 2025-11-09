@@ -32,13 +32,28 @@ void whvn_cli_wallpaper_info_print(WhvnWallpaperInfo info, size_t index) {
     so_free(&color_s);
 }
 
+void whvn_cli_wallpaper_tags_print(WhvnWallpaperInfo info) {
+    printf("%.*s", SO_F(so_get_nodir(info.path)));
+    for(size_t i = 0; i < array_len(info.tags); ++i) {
+        WhvnTag tag = array_at(info.tags, i);
+        printf(",%.*s:%.*s", SO_F(tag.category), SO_F(tag.name));
+    }
+    printf("\n");
+}
+
 int whvn_cli_wallpaper_info(WhvnCli *cli) {
     ASSERT_ARG(cli);
     WhvnWallpaperInfo info = {0};
+    So tag_info = {0};
     int result = whvn_api_wallpaper_info(&cli->api, cli->query.wallpaper_info, &cli->api_buf, &info);
     if(cli->action.print_pretty) {
         whvn_cli_wallpaper_info_print(info, 0);
     }
+    if(cli->action.print_tags) {
+        whvn_api_wallpaper_info(&cli->api, so_get_nodir(info.url), &tag_info, &info);
+        whvn_cli_wallpaper_tags_print(info);
+    }
+    so_free(&tag_info);
     whvn_wallpaper_info_free(&info);
     return result;
 }
@@ -82,6 +97,9 @@ int whvn_cli_search(WhvnCli *cli) {
             }
             if(cli->action.print_pretty) {
                 whvn_cli_wallpaper_info_print(info, n);
+            }
+            if(cli->action.print_tags) {
+                whvn_cli_wallpaper_tags_print(info);
             }
             if(cli->action.open_browser) {
                 so_clear(&out);
@@ -201,6 +219,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     WhvnApiSearch search = cli->search;
     size_t n = 0;
     So out = {0};
+    So tag_info = {0};
     do {
         so_clear(&cli->api_buf);
         result = whvn_api_user_collection(&cli->api, &search, username, id, &cli->api_buf, &response);
@@ -213,6 +232,10 @@ int whvn_cli_user_collection(WhvnCli *cli) {
             }
             if(cli->action.print_pretty) {
                 whvn_cli_wallpaper_info_print(info, n);
+            }
+            if(cli->action.print_tags) {
+                whvn_api_wallpaper_info(&cli->api, so_get_nodir(info.url), &tag_info, &info);
+                whvn_cli_wallpaper_tags_print(info);
             }
             if(cli->action.open_browser) {
                 so_clear(&out);
@@ -229,6 +252,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
         search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
+    so_free(&tag_info);
     return result;
 error:
     return -1;
@@ -321,6 +345,8 @@ int main(int argc, const char **argv) {
           argx_flag_set(x, &cli.action.wait_user, 0);
         x=argx_init(g, 0, so("download"), so(""));
           argx_flag_set(x, &cli.action.download, 0);
+        x=argx_init(g, 0, so("tags"), so("prints the wallpaper with tags in a csv"));
+          argx_flag_set(x, &cli.action.print_tags, 0);
     x=argx_init(o, 'C', so("download-root"), so("output root directory for downloads"));
       argx_str(x, &cli.download_root, &def.download_root);
     x=argx_pos(arg, so("api-call"), so("select api call"));
