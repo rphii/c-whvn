@@ -101,6 +101,7 @@ int whvn_cli_search(WhvnCli *cli) {
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.print_tags) {
+                usleep(WHVN_API_RATE_US);
                 whvn_api_wallpaper_info(&cli->api, so_get_nodir(info.url), &tag_info, &info);
                 whvn_cli_wallpaper_tags_print(info);
             }
@@ -239,6 +240,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.print_tags) {
+                usleep(WHVN_API_RATE_US);
                 whvn_api_wallpaper_info(&cli->api, so_get_nodir(info.url), &tag_info, &info);
                 whvn_cli_wallpaper_tags_print(info);
             }
