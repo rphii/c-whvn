@@ -85,7 +85,9 @@ int whvn_cli_search(WhvnCli *cli) {
     WhvnResponse response = {0};
     WhvnApiSearch search = cli->search;
     So out = {0};
+    So tag_info = SO;
     do {
+        so_clear(&tag_info);
         so_clear(&cli->api_buf);
         result = whvn_api_search(&cli->api, &search, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
@@ -99,6 +101,7 @@ int whvn_cli_search(WhvnCli *cli) {
                 whvn_cli_wallpaper_info_print(info, n);
             }
             if(cli->action.print_tags) {
+                whvn_api_wallpaper_info(&cli->api, so_get_nodir(info.url), &tag_info, &info);
                 whvn_cli_wallpaper_tags_print(info);
             }
             if(cli->action.open_browser) {
@@ -116,6 +119,7 @@ int whvn_cli_search(WhvnCli *cli) {
         search.page = search.page ? search.page + 1 : 2;
     } while(!result && (cli->max ? n < cli->max : true));
     so_free(&out);
+    so_free(&tag_info);
     return result;
 }
 
@@ -221,6 +225,7 @@ int whvn_cli_user_collection(WhvnCli *cli) {
     So out = {0};
     So tag_info = {0};
     do {
+        so_clear(&tag_info);
         so_clear(&cli->api_buf);
         result = whvn_api_user_collection(&cli->api, &search, username, id, &cli->api_buf, &response);
         for(size_t i = 0; !result && i < array_len(response.data); ++i, ++n) {
