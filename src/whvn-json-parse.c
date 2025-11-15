@@ -1,18 +1,18 @@
 #include "whvn-json-parse.h"
 
-void whvn_json_value_parse_purity(JsonParseValue v, WhvnPurity *purity) {
+void whvn_json_value_parse_purity(Json_Parse_Value v, WhvnPurity *purity) {
     if(!so_cmp(v.s, so("sfw"))) purity->sfw = true;
     if(!so_cmp(v.s, so("nsfw"))) purity->nsfw = true;
     if(!so_cmp(v.s, so("sketchy"))) purity->sketchy = true;
 }
 
-void whvn_json_value_parse_category(JsonParseValue v, WhvnCategory *category) {
+void whvn_json_value_parse_category(Json_Parse_Value v, WhvnCategory *category) {
     if(!so_cmp(v.s, so("people"))) category->people = true;
     if(!so_cmp(v.s, so("anime"))) category->anime = true;
     if(!so_cmp(v.s, so("general"))) category->general = true;
 }
 
-WhvnToplistRangeList whvn_json_value_parse_toplist_range(JsonParseValue v) {
+WhvnToplistRangeList whvn_json_value_parse_toplist_range(Json_Parse_Value v) {
     WhvnToplistRangeList range = WHVN_TOPLIST_RANGE_NONE;
     if(!so_cmp(v.s, so("1d"))) range = WHVN_TOPLIST_RANGE_1D;
     if(!so_cmp(v.s, so("3d"))) range = WHVN_TOPLIST_RANGE_3D;
@@ -24,8 +24,8 @@ WhvnToplistRangeList whvn_json_value_parse_toplist_range(JsonParseValue v) {
     return range;
 }
 
-void *whvn_json_parse_thumbs(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_thumbs(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     WhvnThumbs *thumbs = *(WhvnThumbs **)user;
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     if(!so_cmp(key.s, so("small"))) json_fix_so(&thumbs->small, v.s);
@@ -34,8 +34,8 @@ void *whvn_json_parse_thumbs(void **user, JsonParseValue key, JsonParseValue *va
     return 0;
 }
 
-void *whvn_json_parse_colors(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_colors(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     Color ***info = (Color ***)user;
     Color color = {0};
@@ -44,8 +44,8 @@ void *whvn_json_parse_colors(void **user, JsonParseValue key, JsonParseValue *va
     return 0;
 }
 
-void *whvn_json_parse_tag(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_tag(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     WhvnTag *tag = *(WhvnTag **)user;
     //return 0;
@@ -61,8 +61,8 @@ void *whvn_json_parse_tag(void **user, JsonParseValue key, JsonParseValue *val) 
     return 0;
 }
 
-void *whvn_json_parse_tags(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_tags(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     WhvnTags *tags = *(WhvnTags **)user;
     size_t len = array_len(*tags);
@@ -71,8 +71,8 @@ void *whvn_json_parse_tags(void **user, JsonParseValue key, JsonParseValue *val)
     return whvn_json_parse_tag;
 }
 
-void *whvn_json_parse_avatar(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_avatar(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     WhvnAvatar *avatar = *(WhvnAvatar **)user;
     if(!so_cmp(key.s, so("200px"))) json_fix_so(&avatar->px200, v.s);
@@ -82,8 +82,8 @@ void *whvn_json_parse_avatar(void **user, JsonParseValue key, JsonParseValue *va
     return 0;
 }
 
-void *whvn_json_parse_uploader(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_uploader(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     WhvnUploader *uploader = *(WhvnUploader **)user;
     if(key.id == JSON_OBJECT && !so_cmp(key.s, so("avatar"))) {
@@ -95,8 +95,8 @@ void *whvn_json_parse_uploader(void **user, JsonParseValue key, JsonParseValue *
     return 0;
 }
 
-void *whvn_json_parse_wallpaper_info(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_wallpaper_info(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     WhvnWallpaperInfo *info = (*(WhvnWallpaperInfo **)user);
     //printff("  %s - '%.*s' : '%.*s' %u", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)), v.id);
     if(key.id == JSON_OBJECT && !so_cmp(key.s, so("thumbs"))) {
@@ -142,7 +142,7 @@ void *whvn_json_parse_wallpaper_info(void **user, JsonParseValue key, JsonParseV
     return 0;
 }
 
-void *whvn_json_parse_data_wallpaper_info(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_data_wallpaper_info(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(key.id == JSON_OBJECT) {
         return whvn_json_parse_wallpaper_info;
     }
@@ -158,10 +158,10 @@ void *whvn_json_parse_data_wallpaper_info(void **user, JsonParseValue key, JsonP
 
 //printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_so(key)));
     
-void *whvn_json_parse_tag_info(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_tag_info(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(key.id != JSON_OBJECT) return 0;
     if(!val) return 0;
-    JsonParseValue v = *val;
+    Json_Parse_Value v = *val;
     WhvnTag *tag = *(WhvnTag **)user;
     size_t z = 0;
     if(v.id == JSON_NUMBER) so_as_size(v.s, &z, 10);
@@ -175,15 +175,15 @@ void *whvn_json_parse_tag_info(void **user, JsonParseValue key, JsonParseValue *
     return 0;
 }
 
-void *whvn_json_parse_data_tag_info(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_data_tag_info(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(!so_cmp(key.s, so("data"))) {
         return whvn_json_parse_tag_info;
     }
     return 0;
 }
 
-void *whvn_json_parse_user_settings_purity(void **user, JsonParseValue key, JsonParseValue *val) {
-    //JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_user_settings_purity(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    //Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printf(" %s - '%.*s' : '%.*s'\n", __func__, STR_F(json_parse_value_so(key)), STR_F(v.s));
     if(!val) return 0;
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
@@ -191,8 +191,8 @@ void *whvn_json_parse_user_settings_purity(void **user, JsonParseValue key, Json
     return 0;
 }
 
-void *whvn_json_parse_user_settings_categories(void **user, JsonParseValue key, JsonParseValue *val) {
-    //JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_user_settings_categories(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    //Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printf(" %s - '%.*s' : '%.*s'\n", __func__, STR_F(json_parse_value_so(key)), STR_F(v.s));
     if(!val) return 0;
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
@@ -200,7 +200,7 @@ void *whvn_json_parse_user_settings_categories(void **user, JsonParseValue key, 
     return 0;
 }
 
-void *whvn_json_parse_user_settings_stringvec(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_user_settings_stringvec(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(!val) return 0;
     if(!so_len(val->s)) return 0;
     VSo *vec = *(VSo **)user;
@@ -211,8 +211,8 @@ void *whvn_json_parse_user_settings_stringvec(void **user, JsonParseValue key, J
     return 0;
 }
 
-void *whvn_json_parse_user_settings(void **user, JsonParseValue key, JsonParseValue *val) {
-    JsonParseValue v = val ? *val : (JsonParseValue){0};
+void *whvn_json_parse_user_settings(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
+    Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printf(" %s - '%.*s'\n", __func__, STR_F(json_parse_value_so(key)));
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
     size_t z = 0;
@@ -245,14 +245,14 @@ void *whvn_json_parse_user_settings(void **user, JsonParseValue key, JsonParseVa
     return 0;
 }
 
-void *whvn_json_parse_data_user_settings(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_data_user_settings(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(!so_cmp(key.s, so("data"))) {
         return whvn_json_parse_user_settings;
     }
     return 0;
 }
 
-void *whvn_json_parse_user_collection(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_user_collection(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(!val) return 0;
     WhvnUserCollection *collection = *(WhvnUserCollection **)user;
     size_t z = 0;
@@ -265,7 +265,7 @@ void *whvn_json_parse_user_collection(void **user, JsonParseValue key, JsonParse
     return 0;
 }
 
-void *whvn_json_parse_user_collections(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_user_collections(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     WhvnUserCollections *collections = *(WhvnUserCollections **)user;
     size_t len = array_len(*collections);
     array_resize(*collections, len + 1);
@@ -273,7 +273,7 @@ void *whvn_json_parse_user_collections(void **user, JsonParseValue key, JsonPars
     return whvn_json_parse_user_collection;
 }
 
-void *whvn_json_parse_data_user_collections(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_data_user_collections(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(!so_cmp(key.s, so("data"))) {
         return whvn_json_parse_user_collections;
     }
@@ -281,7 +281,7 @@ void *whvn_json_parse_data_user_collections(void **user, JsonParseValue key, Jso
 }
 
 
-void *whvn_json_parse_meta(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_meta(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(key.id != JSON_OBJECT) return 0;
     if(!val) return 0;
     WhvnMeta *meta = (*(WhvnMeta **)user);
@@ -298,7 +298,7 @@ void *whvn_json_parse_meta(void **user, JsonParseValue key, JsonParseValue *val)
 }
 
     //printff("%s - '%.*s'", __func__, STR_F(json_parse_value_so(key)));
-void *whvn_json_parse_response(void **user, JsonParseValue key, JsonParseValue *val) {
+void *whvn_json_parse_response(void **user, Json_Parse_Value key, Json_Parse_Value *val) {
     if(key.id == JSON_OBJECT && !so_cmp(key.s, so("data"))) {
         *user = (WhvnWallpaperInfo *)&(*(WhvnResponse **)user)->data;
         return whvn_json_parse_data_wallpaper_info;
