@@ -28,9 +28,9 @@ void *whvn_json_parse_thumbs(void **user, Json_Parse_Value key, Json_Parse_Value
     Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     WhvnThumbs *thumbs = *(WhvnThumbs **)user;
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
-    if(!so_cmp(key.s, so("small"))) json_fix_so(&thumbs->small, v.s);
-    if(!so_cmp(key.s, so("large"))) json_fix_so(&thumbs->large, v.s);
-    if(!so_cmp(key.s, so("original"))) json_fix_so(&thumbs->original, v.s);
+    if(!so_cmp(key.s, so("small"))) json_fix_so(v.s, &thumbs->small);
+    if(!so_cmp(key.s, so("large"))) json_fix_so(v.s, &thumbs->large);
+    if(!so_cmp(key.s, so("original"))) json_fix_so(v.s, &thumbs->original);
     return 0;
 }
 
@@ -52,12 +52,12 @@ void *whvn_json_parse_tag(void **user, Json_Parse_Value key, Json_Parse_Value *v
     size_t z = 0;
     if(v.id == JSON_NUMBER) so_as_size(v.s, &z, 10);
     if(!so_cmp(key.s, so("id"))) tag->id = z;
-    if(!so_cmp(key.s, so("name"))) json_fix_so(&tag->name, v.s);
-    if(!so_cmp(key.s, so("alias"))) json_fix_so(&tag->alias, v.s);
+    if(!so_cmp(key.s, so("name"))) json_fix_so(v.s, &tag->name);
+    if(!so_cmp(key.s, so("alias"))) json_fix_so(v.s, &tag->alias);
     if(!so_cmp(key.s, so("category_id"))) tag->category_id = z;
-    if(!so_cmp(key.s, so("category"))) json_fix_so(&tag->category, v.s);
+    if(!so_cmp(key.s, so("category"))) json_fix_so(v.s, &tag->category);
     if(!so_cmp(key.s, so("purity"))) whvn_json_value_parse_purity(v, &tag->purity);
-    if(!so_cmp(key.s, so("created_at"))) json_fix_so(&tag->created_at, v.s);
+    if(!so_cmp(key.s, so("created_at"))) json_fix_so(v.s, &tag->created_at);
     return 0;
 }
 
@@ -75,10 +75,10 @@ void *whvn_json_parse_avatar(void **user, Json_Parse_Value key, Json_Parse_Value
     Json_Parse_Value v = val ? *val : (Json_Parse_Value){0};
     //printff("   %s - '%.*s' : '%.*s'", __func__, STR_F(json_parse_value_so(key)), STR_F(json_parse_value_so(v)));
     WhvnAvatar *avatar = *(WhvnAvatar **)user;
-    if(!so_cmp(key.s, so("200px"))) json_fix_so(&avatar->px200, v.s);
-    if(!so_cmp(key.s, so("128px"))) json_fix_so(&avatar->px128, v.s);
-    if(!so_cmp(key.s, so("32px"))) json_fix_so(&avatar->px32, v.s);
-    if(!so_cmp(key.s, so("20px"))) json_fix_so(&avatar->px20, v.s);
+    if(!so_cmp(key.s, so("200px"))) json_fix_so(v.s, &avatar->px200);
+    if(!so_cmp(key.s, so("128px"))) json_fix_so(v.s, &avatar->px128);
+    if(!so_cmp(key.s, so("32px"))) json_fix_so(v.s, &avatar->px32);
+    if(!so_cmp(key.s, so("20px"))) json_fix_so(v.s, &avatar->px20);
     return 0;
 }
 
@@ -90,8 +90,8 @@ void *whvn_json_parse_uploader(void **user, Json_Parse_Value key, Json_Parse_Val
         *user = &uploader->avatar;
         return whvn_json_parse_avatar;
     }
-    if(!so_cmp(key.s, so("username"))) json_fix_so(&uploader->username, v.s);
-    if(!so_cmp(key.s, so("group"))) json_fix_so(&uploader->group, v.s);
+    if(!so_cmp(key.s, so("username"))) json_fix_so(v.s, &uploader->username);
+    if(!so_cmp(key.s, so("group"))) json_fix_so(v.s, &uploader->group);
     return 0;
 }
 
@@ -122,22 +122,22 @@ void *whvn_json_parse_wallpaper_info(void **user, Json_Parse_Value key, Json_Par
         double d = 0;
         if(v.id == JSON_NUMBER) so_as_double(v.s, &d);
         //printff("val.id %u, key.id %u",v.id, key.id);
-        if(!so_cmp(key.s, so("id"))) json_fix_so(&info->id, v.s);
-        else if(!so_cmp(key.s, so("url"))) json_fix_so(&info->url, v.s);
-        else if(!so_cmp(key.s, so("short_url"))) json_fix_so(&info->short_url, v.s);
+        if(!so_cmp(key.s, so("id"))) json_fix_so(v.s, &info->id);
+        else if(!so_cmp(key.s, so("url"))) json_fix_so(v.s, &info->url);
+        else if(!so_cmp(key.s, so("short_url"))) json_fix_so(v.s, &info->short_url);
         else if(!so_cmp(key.s, so("views"))) info->views = (unsigned long)z;
         else if(!so_cmp(key.s, so("favorites"))) info->favorites = (unsigned long)z;
-        else if(!so_cmp(key.s, so("source"))) json_fix_so(&info->source, v.s);
+        else if(!so_cmp(key.s, so("source"))) json_fix_so(v.s, &info->source);
         else if(!so_cmp(key.s, so("purity"))) whvn_json_value_parse_purity(v, &info->purity);
         else if(!so_cmp(key.s, so("category"))) whvn_json_value_parse_category(v, &info->category);
         else if(!so_cmp(key.s, so("dimension_x"))) info->dimension_x = (unsigned long)z;
         else if(!so_cmp(key.s, so("dimension_y"))) info->dimension_y = (unsigned long)z;
-        else if(!so_cmp(key.s, so("resolution"))) json_fix_so(&info->resolution, v.s);
-        else if(!so_cmp(key.s, so("ratio"))) json_fix_so(&info->ratio, v.s);
+        else if(!so_cmp(key.s, so("resolution"))) json_fix_so(v.s, &info->resolution);
+        else if(!so_cmp(key.s, so("ratio"))) json_fix_so(v.s, &info->ratio);
         else if(!so_cmp(key.s, so("file_size"))) info->file_size = (unsigned long)z;
-        else if(!so_cmp(key.s, so("file_type"))) json_fix_so(&info->file_type, v.s);
-        else if(!so_cmp(key.s, so("created_at"))) json_fix_so(&info->created_at, v.s);
-        else if(!so_cmp(key.s, so("path"))) json_fix_so(&info->path, v.s);
+        else if(!so_cmp(key.s, so("file_type"))) json_fix_so(v.s, &info->file_type);
+        else if(!so_cmp(key.s, so("created_at"))) json_fix_so(v.s, &info->created_at);
+        else if(!so_cmp(key.s, so("path"))) json_fix_so(v.s, &info->path);
     }
     return 0;
 }
@@ -166,12 +166,12 @@ void *whvn_json_parse_tag_info(void **user, Json_Parse_Value key, Json_Parse_Val
     size_t z = 0;
     if(v.id == JSON_NUMBER) so_as_size(v.s, &z, 10);
     if(!so_cmp(key.s, so("id"))) tag->id = z;
-    else if(!so_cmp(key.s, so("name"))) json_fix_so(&tag->name, v.s);
-    else if(!so_cmp(key.s, so("alias"))) json_fix_so(&tag->alias, v.s);
+    else if(!so_cmp(key.s, so("name"))) json_fix_so(v.s, &tag->name);
+    else if(!so_cmp(key.s, so("alias"))) json_fix_so(v.s, &tag->alias);
     else if(!so_cmp(key.s, so("category_id"))) tag->category_id = z;
-    else if(!so_cmp(key.s, so("category"))) json_fix_so(&tag->category, v.s);
+    else if(!so_cmp(key.s, so("category"))) json_fix_so(v.s, &tag->category);
     else if(!so_cmp(key.s, so("purity"))) whvn_json_value_parse_purity(v, &tag->purity);
-    else if(!so_cmp(key.s, so("created_at"))) json_fix_so(&tag->created_at, v.s);
+    else if(!so_cmp(key.s, so("created_at"))) json_fix_so(v.s, &tag->created_at);
     return 0;
 }
 
@@ -207,7 +207,7 @@ void *whvn_json_parse_user_settings_stringvec(void **user, Json_Parse_Value key,
     size_t len = array_len(*vec);
     array_resize(*vec, len + 1);
     So *s = array_it(*vec, len);
-    json_fix_so(s, val->s);
+    json_fix_so(val->s, s);
     return 0;
 }
 
@@ -217,7 +217,7 @@ void *whvn_json_parse_user_settings(void **user, Json_Parse_Value key, Json_Pars
     WhvnUserSettings *settings = *(WhvnUserSettings **)user;
     size_t z = 0;
     if(v.id == JSON_NUMBER) so_as_size(v.s, &z, 10);
-    if(!so_cmp(key.s, so("thumb_size"))) json_fix_so(&settings->thumb_size, v.s);
+    if(!so_cmp(key.s, so("thumb_size"))) json_fix_so(v.s, &settings->thumb_size);
     if(!so_cmp(key.s, so("per_page"))) {
         so_as_size(v.s, &z, 10);
         settings->per_page = z;
@@ -258,7 +258,7 @@ void *whvn_json_parse_user_collection(void **user, Json_Parse_Value key, Json_Pa
     size_t z = 0;
     if(val->id == JSON_NUMBER) so_as_size(val->s, &z, 10);
     if(!so_cmp(key.s, so("id"))) collection->id = z;
-    else if(!so_cmp(key.s, so("label"))) json_fix_so(&collection->label, val->s);
+    else if(!so_cmp(key.s, so("label"))) json_fix_so(val->s, &collection->label);
     else if(!so_cmp(key.s, so("views"))) collection->views = z;
     else if(!so_cmp(key.s, so("public"))) collection->is_public = z;
     else if(!so_cmp(key.s, so("count"))) collection->count = z;
@@ -292,7 +292,7 @@ void *whvn_json_parse_meta(void **user, Json_Parse_Value key, Json_Parse_Value *
     else if(!so_cmp(key.s, so("last_page"))) meta->last_page = (unsigned long)z;
     else if(!so_cmp(key.s, so("per_page"))) meta->per_page = (unsigned long)z;
     else if(!so_cmp(key.s, so("total"))) meta->total = (unsigned long)z;
-    else if(!so_cmp(key.s, so("query"))) json_fix_so(&meta->query, val->s);
+    else if(!so_cmp(key.s, so("query"))) json_fix_so(val->s, &meta->query);
     else if(!so_cmp(key.s, so("seed"))) {}
     return 0;
 }
