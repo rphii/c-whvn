@@ -12,7 +12,7 @@ void whvn_collection_init(WhvnCollection *self) {
 void whvn_collection_add(WhvnCollection *self, WhvnWallpaperInfo *wp) {
     ASSERT_ARG(self);
     ASSERT_ARG(wp);
-    TWhvnWallpaperInfoKV *have = twhvn_wallpaper_info_get_kv(&self->map, &wp->id);
+    TWhvnWallpaperInfo_KV *have = twhvn_wallpaper_info_get_kv(&self->map, &wp->id);
     if(!have) {
         have = twhvn_wallpaper_info_set(&self->map, &wp->id, wp);
         //printff("CREATED %p %.*s",have, STR_F(wp->id));

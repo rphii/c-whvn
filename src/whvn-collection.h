@@ -6,7 +6,7 @@
 LUT_INCLUDE(TWhvnWallpaperInfo, twhvn_wallpaper_info, So, BY_REF, WhvnWallpaperInfo, BY_REF);
 
 typedef struct WhvnCollection {
-    TWhvnWallpaperInfoKV **vec;
+    TWhvnWallpaperInfo_KV **vec;
     TWhvnWallpaperInfo map;
 } WhvnCollection;
 
