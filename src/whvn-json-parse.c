@@ -1,4 +1,5 @@
 #include "whvn-json-parse.h"
+#include <rlso.h>
 
 void whvn_json_value_parse_purity(Json_Parse_Value v, WhvnPurity *purity) {
     if(!so_cmp(v.s, so("sfw"))) purity->sfw = true;
@@ -13,14 +14,16 @@ void whvn_json_value_parse_category(Json_Parse_Value v, WhvnCategory *category) 
 }
 
 WhvnToplistRangeList whvn_json_value_parse_toplist_range(Json_Parse_Value v) {
-    WhvnToplistRangeList range = WHVN_TOPLIST_RANGE_NONE;
-    if(!so_cmp(v.s, so("1d"))) range = WHVN_TOPLIST_RANGE_1D;
-    if(!so_cmp(v.s, so("3d"))) range = WHVN_TOPLIST_RANGE_3D;
-    if(!so_cmp(v.s, so("1w"))) range = WHVN_TOPLIST_RANGE_1W;
-    if(!so_cmp(v.s, so("1M"))) range = WHVN_TOPLIST_RANGE_1M;
-    if(!so_cmp(v.s, so("3M"))) range = WHVN_TOPLIST_RANGE_3M;
-    if(!so_cmp(v.s, so("6M"))) range = WHVN_TOPLIST_RANGE_6M;
-    if(!so_cmp(v.s, so("1Y"))) range = WHVN_TOPLIST_RANGE_1Y;
+    WhvnToplistRangeList range = so_switch(v.s, WHVN_TOPLIST_RANGE_NONE,
+            So_Switches(
+                WHVN_TOPLIST_RANGE_1D, so("1d"),
+                WHVN_TOPLIST_RANGE_3D, so("3d"),
+                WHVN_TOPLIST_RANGE_1W, so("1w"),
+                WHVN_TOPLIST_RANGE_1M, so("1M"),
+                WHVN_TOPLIST_RANGE_3M, so("3M"),
+                WHVN_TOPLIST_RANGE_6M, so("6M"),
+                WHVN_TOPLIST_RANGE_1Y, so("1Y"),
+            ));                        
     return range;
 }
 
