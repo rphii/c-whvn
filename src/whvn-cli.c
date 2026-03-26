@@ -365,6 +365,7 @@ int main(int argc, const char **argv) {
         x=argx_opt(g, 0, so("wallpaper-info"), so("get wallpaper info"));
           argx_type_so(x, &cli.query.wallpaper_info, 0);
           argx_callback(x, whvn_cli_wallpaper_info, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
         x=argx_opt(g, 0, so("search"), so("search wallpapers\n"
             "tagname - search fuzzily for a tag/keyword\n"
             "-tagname - exclude a tag/keyword\n"
@@ -376,16 +377,21 @@ int main(int argc, const char **argv) {
             "like:wallpaper ID - Find wallpapers with similar tags"));
           argx_type_so(x, &cli.search.query, 0);
           argx_callback(x, whvn_cli_search, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
         x=argx_opt(g, 0, so("tag-info"), so("get wallpaper tag info"));
           argx_type_so(x, &cli.query.tag_info, 0);
           argx_callback(x, whvn_cli_tag_info, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
         x=argx_opt(g, 0, so("user-settings"), so("get user settings"));
           argx_callback(x, whvn_cli_user_settings, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
         x=argx_opt(g, 0, so("user-collections"), so("get user collections"));
           argx_callback(x, whvn_cli_user_collections, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
         x=argx_opt(g, 0, so("user-collection"), so("get a user's collection"));
           argx_type_so(x, &cli.query.user_collection, 0);
           argx_callback(x, whvn_cli_user_collection, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
           argx_hint_text(x, so("user/id"));
 
     x=argx_opt(o, 'c', so("categories"), so("search: categories"));
