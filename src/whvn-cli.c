@@ -328,11 +328,15 @@ int main(int argc, const char **argv) {
         .max = 24,
     };
     so_extend_wordexp(&def.download_root, so("$HOME/Downloads/whvn"), false);
-    cli.arg = arg_new();
+    cli.arg_config = arg_config_new();
+    arg_config_set_program(cli.arg_config, so_l(argv[0]));
+    arg_config_set_description(cli.arg_config, so("wallhaven API cli"));
+    arg_config_set_epilog(cli.arg_config, so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
+    cli.arg = arg_new(cli.arg_config);
     struct Arg *arg = cli.arg;
     struct Argx *x = 0;
     struct Argx_Group *o = 0, *g = 0;
-    // TODO >>> arg_init(arg, so("whvn-cli"), so("wallhaven API cli"), so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
+
     // TODO >>> arg_init_width(cli.arg, 100, 45);
     // TODO >>> arg_init_fmt(cli.arg);
 
