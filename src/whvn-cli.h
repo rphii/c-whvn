@@ -4,6 +4,7 @@
 #include "whvn-api.h"
 
 typedef struct WhvnCli {
+    struct Arg_Config *arg_config;
     struct Arg *arg;
     WhvnApi api;
     So api_buf;
