@@ -333,6 +333,7 @@ int main(int argc, const char **argv) {
     arg_config_set_description(cli.arg_config, so("wallhaven API cli"));
     arg_config_set_epilog(cli.arg_config, so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
     cli.arg = arg_new(cli.arg_config);
+    arg_enable_config_print(cli.arg, true);
     struct Arg *arg = cli.arg;
     struct Argx *x = 0;
     struct Argx_Group *o = 0, *g = 0;
