@@ -1,4 +1,4 @@
 [wrap-git]
 url = https://github.com/rphii/rlso.git
-revision = main
+revision = v0.2.0
 
