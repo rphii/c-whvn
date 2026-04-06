@@ -342,11 +342,11 @@ int main(int argc, const char **argv) {
     // TODO >>> arg_init_fmt(cli.arg);
 
     o=argx_group(arg, so("options"));
-    argx_builtin_opt_help(o);
-    argx_builtin_opt_source(o, so("/etc/whvn/whvn.conf"));
-    argx_builtin_opt_source(o, so("$HOME/.config/rphiic/colors.conf"));
-    argx_builtin_opt_source(o, so("$HOME/.config/whvn/whvn.conf"));
-    argx_builtin_opt_source(o, so("$XDG_CONFIG_HOME/whvn/whvn.conf"));
+    argx_builtin_opt_help(o, ARGX_BUILTIN_OPT_HELP);
+    argx_builtin_opt_source(o, ARGX_BUILTIN_OPT_SOURCE, so("/etc/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, ARGX_BUILTIN_OPT_SOURCE, so("$HOME/.config/rphiic/colors.conf"));
+    argx_builtin_opt_source(o, ARGX_BUILTIN_OPT_SOURCE, so("$HOME/.config/whvn/whvn.conf"));
+    argx_builtin_opt_source(o, ARGX_BUILTIN_OPT_SOURCE, so("$XDG_CONFIG_HOME/whvn/whvn.conf"));
     x=argx_opt(o, 'U', so("url"), so("api URL"));
       argx_type_so(x, &cli.api.url, &def.api.url);
     x=argx_opt(o, 'P', so("print"), so("print the raw API response"));
