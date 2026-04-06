@@ -41,7 +41,8 @@ void whvn_cli_wallpaper_tags_print(WhvnWallpaperInfo info) {
     printf("\n");
 }
 
-int whvn_cli_wallpaper_info(WhvnCli *cli) {
+int whvn_cli_wallpaper_info(struct Argx *x, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     WhvnWallpaperInfo info = {0};
     So tag_info = {0};
@@ -78,7 +79,8 @@ void whvn_cli_download(WhvnCli *cli, So folder, WhvnWallpaperInfo *info) {
     //usleep(WHVN_API_RATE_US);
 }
 
-int whvn_cli_search(WhvnCli *cli) {
+int whvn_cli_search(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     int result = 0;
     size_t n = 0;
@@ -124,7 +126,8 @@ int whvn_cli_search(WhvnCli *cli) {
     return result;
 }
 
-int whvn_cli_tag_info(WhvnCli *cli) {
+int whvn_cli_tag_info(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     WhvnTag tag_info = {0};
     int result = whvn_api_tag_info(&cli->api, cli->query.tag_info, &cli->api_buf, &tag_info);
@@ -135,7 +138,8 @@ int whvn_cli_tag_info(WhvnCli *cli) {
     return result;
 }
 
-int whvn_cli_user_settings(WhvnCli *cli) {
+int whvn_cli_user_settings(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     WhvnUserSettings settings = {0};
     int result = whvn_api_user_settings(&cli->api, &cli->api_buf, &settings);
@@ -167,7 +171,8 @@ int whvn_cli_user_settings(WhvnCli *cli) {
     return result;
 }
 
-int whvn_cli_user_collections(WhvnCli *cli) {
+int whvn_cli_user_collections(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     WhvnUserCollections collections = {0};
     int result = whvn_api_user_collections(&cli->api, cli->search.page, &cli->api_buf, &collections);
@@ -181,7 +186,8 @@ int whvn_cli_user_collections(WhvnCli *cli) {
     return result;
 }
 
-int whvn_cli_user_collection(WhvnCli *cli) {
+int whvn_cli_user_collection(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     ASSERT_ARG(cli);
     WhvnResponse response = {0};
     So username = {0};
@@ -265,7 +271,8 @@ error:
     return -1;
 }
 
-int whvn_cli_check_apikey_present(WhvnCli *cli) {
+int whvn_cli_check_apikey_present(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     if(!so_len(cli->api.key)) {
         THROW("require API key");
     }
@@ -274,7 +281,8 @@ error:
     return -1;
 }
 
-int cli_ratio(WhvnCli *cli) {
+int cli_ratio(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     So recent = array_at(cli->vbuf_ratios, array_len(cli->vbuf_ratios) - 1);
     WhvnRatio ratio = whvn_ratio_parse(recent);
     if((ratio.h && ratio.w) || ratio.type != WHVN_RATIO) {
@@ -285,7 +293,8 @@ int cli_ratio(WhvnCli *cli) {
     return -1;
 }
 
-int cli_atleast(WhvnCli *cli) {
+int cli_atleast(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     So recent = cli->buf_atleast;
     WhvnResolution res = whvn_resolution_parse(recent);
     if(whvn_resolution_is_valid(res)) {
@@ -296,7 +305,8 @@ int cli_atleast(WhvnCli *cli) {
     return -1;
 }
 
-int cli_resolution(WhvnCli *cli) {
+int cli_resolution(struct Argx *argx, void *user, So so) {
+    WhvnCli *cli = user;
     So recent = array_at(cli->vbuf_resolutions, array_len(cli->vbuf_resolutions) - 1);
     WhvnResolution res = whvn_resolution_parse(recent);
     if(whvn_resolution_is_valid(res)) {
@@ -318,50 +328,50 @@ int main(int argc, const char **argv) {
         .max = 24,
     };
     so_extend_wordexp(&def.download_root, so("$HOME/Downloads/whvn"), false);
-    cli.arg = arg_new();
+    cli.arg_config = arg_config_new();
+    arg_config_set_program(cli.arg_config, so_l(argv[0]));
+    arg_config_set_description(cli.arg_config, so("wallhaven API cli"));
+    arg_config_set_epilog(cli.arg_config, so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
+    cli.arg = arg_new(cli.arg_config);
+    arg_enable_config_print(cli.arg, true);
     struct Arg *arg = cli.arg;
-    arg_init(arg, so("whvn-cli"), so("wallhaven API cli"), so(F("https://github.com/rphii/c-whvn", FG_BL_B UL)));
-    arg_init_width(cli.arg, 100, 45);
-    arg_init_fmt(cli.arg);
+    struct Argx *x = 0;
+    struct Argx_Group *o = 0, *g = 0;
 
-    struct ArgX *x = 0;
-    struct ArgXGroup *o = 0, *g = 0;
-    o=argx_group(arg, so("Options"), false);
+    // TODO >>> arg_init_width(cli.arg, 100, 45);
+    // TODO >>> arg_init_fmt(cli.arg);
+
+    o=argx_group(arg, so("options"));
     argx_builtin_opt_help(o);
     argx_builtin_opt_source(o, so("/etc/whvn/whvn.conf"));
     argx_builtin_opt_source(o, so("$HOME/.config/rphiic/colors.conf"));
     argx_builtin_opt_source(o, so("$HOME/.config/whvn/whvn.conf"));
     argx_builtin_opt_source(o, so("$XDG_CONFIG_HOME/whvn/whvn.conf"));
-    x=argx_init(o, 'U', so("url"), so("api URL"));
-      argx_str(x, &cli.api.url, &def.api.url);
-    x=argx_init(o, 'P', so("print"), so("print the raw API response"));
-      g=argx_flag(x);
-        x=argx_init(g, 0, so("url"), so("print the raw API URL"));
-          argx_flag_set(x, &cli.api.print_url, 0);
-        x=argx_init(g, 0, so("response"), so("print the raw API response"));
-          argx_flag_set(x, &cli.api.print_response, 0);
-    x=argx_init(o, 'n', so("max"), so("number of maximum results"));
-      argx_ssz(x, &cli.max, &def.max);
-    x=argx_init(o, 'a', so("action"), so("what to do with results"));
-      g=argx_flag(x);
-        x=argx_init(g, 0, so("pretty"), so(""));
-          argx_flag_set(x, &cli.action.print_pretty, &def.action.print_pretty);
-        x=argx_init(g, 0, so("browser"), so(""));
-          argx_flag_set(x, &cli.action.open_browser, 0);
-        x=argx_init(g, 0, so("wait"), so(""));
-          argx_flag_set(x, &cli.action.wait_user, 0);
-        x=argx_init(g, 0, so("download"), so(""));
-          argx_flag_set(x, &cli.action.download, 0);
-        x=argx_init(g, 0, so("tags"), so("prints the wallpaper with tags in a csv"));
-          argx_flag_set(x, &cli.action.print_tags, 0);
-    x=argx_init(o, 'C', so("download-root"), so("output root directory for downloads"));
-      argx_str(x, &cli.download_root, &def.download_root);
+    x=argx_opt(o, 'U', so("url"), so("api URL"));
+      argx_type_so(x, &cli.api.url, &def.api.url);
+    x=argx_opt(o, 'P', so("print"), so("print the raw API response"));
+      g=argx_group_flags(x);
+        argx_flag(g, &cli.api.print_url, 0, so("url"), so("print the raw API URL"));
+        argx_flag(g, &cli.api.print_response, 0, so("response"), so("print the raw API response"));
+    x=argx_opt(o, 'n', so("max"), so("number of maximum results"));
+      argx_type_size(x, &cli.max, &def.max);
+    x=argx_opt(o, 'a', so("action"), so("what to do with results"));
+      g=argx_group_flags(x);
+        argx_flag(g, &cli.action.print_pretty, &def.action.print_pretty, so("pretty"), so(""));
+        argx_flag(g, &cli.action.open_browser, 0, so("browser"), so(""));
+        argx_flag(g, &cli.action.wait_user, 0, so("wait"), so(""));
+        argx_flag(g, &cli.action.download, 0, so("download"), so(""));
+        argx_flag(g, &cli.action.print_tags, 0, so("tags"), so("prints the wallpaper with tags in a csv"));
+    x=argx_opt(o, 'C', so("download-root"), so("output root directory for downloads"));
+      argx_type_so(x, &cli.download_root, &def.download_root);
+
     x=argx_pos(arg, so("api-call"), so("select api call"));
-      g=argx_opt(x, 0, 0);
-        x=argx_init(g, 0, so("wallpaper-info"), so("get wallpaper info"));
-          argx_str(x, &cli.query.wallpaper_info, 0);
-          argx_func(x, 2, whvn_cli_wallpaper_info, &cli, false, false);
-        x=argx_init(g, 0, so("search"), so("search wallpapers\n"
+      g=argx_group_options(x);
+        x=argx_opt(g, 0, so("wallpaper-info"), so("get wallpaper info"));
+          argx_type_so(x, &cli.query.wallpaper_info, 0);
+          argx_callback(x, whvn_cli_wallpaper_info, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+        x=argx_opt(g, 0, so("search"), so("search wallpapers\n"
             "tagname - search fuzzily for a tag/keyword\n"
             "-tagname - exclude a tag/keyword\n"
             "+tag1 +tag2 - must have tag1 and tag2\n"
@@ -370,97 +380,82 @@ int main(int argc, const char **argv) {
             "id:123 - Exact tag search (can not be combined)\n"
             "type:{png/jpg} - Search for file type (jpg = jpeg)\n"
             "like:wallpaper ID - Find wallpapers with similar tags"));
-          argx_str(x, &cli.search.query, 0);
-          argx_func(x, 2, whvn_cli_search, &cli, false, false);
-        x=argx_init(g, 0, so("tag-info"), so("get wallpaper tag info"));
-          argx_str(x, &cli.query.tag_info, 0);
-          argx_func(x, 2, whvn_cli_tag_info, &cli, false, false);
-        x=argx_init(g, 0, so("user-settings"), so("get user settings"));
-          argx_func(x, 1, whvn_cli_user_settings, &cli, false, false);
-        x=argx_init(g, 0, so("user-collections"), so("get user collections"));
-          argx_func(x, 2, whvn_cli_user_collections, &cli, false, false);
-        x=argx_init(g, 0, so("user-collection"), so("get a user's collection"));
-          argx_str(x, &cli.query.user_collection, 0);
-          argx_func(x, 2, whvn_cli_user_collection, &cli, false, false);
-          argx_type(x, so("user/id"));
-    x=argx_init(o, 'c', so("categories"), so("search: categories"));
-      g=argx_flag(x);
-        x=argx_init(g, 0, so("general"), so(""));
-          argx_flag_set(x, &cli.search.categories.general, 0);
-        x=argx_init(g, 0, so("anime"), so(""));
-          argx_flag_set(x, &cli.search.categories.anime, 0);
-        x=argx_init(g, 0, so("people"), so(""));
-          argx_flag_set(x, &cli.search.categories.people, 0);
-    x=argx_init(o, 'p', so("purity"), so("search: purity"));
-      g=argx_flag(x);
-        x=argx_init(g, 0, so("sfw"), so(""));
-          argx_flag_set(x, &cli.search.purity.sfw, 0);
-        x=argx_init(g, 0, so("sketchy"), so(""));
-          argx_flag_set(x, &cli.search.purity.sketchy, 0);
-        x=argx_init(g, 0, so("nsfw"), so("requires API key"));
-          argx_flag_set(x, &cli.search.purity.nsfw, 0);
-          argx_func(x, 1, whvn_cli_check_apikey_present, &cli, false, false);
-    x=argx_init(o, 's', so("sorting"), so("search: sorting"));
-      g=argx_opt(x, (int *)&cli.search.sorting, 0);
-        x=argx_init(g, 0, so("date_added"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_DATE_ADDED);
-        x=argx_init(g, 0, so("relevance"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_RELEVANCE);
-        x=argx_init(g, 0, so("random"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_RANDOM);
-        x=argx_init(g, 0, so("views"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_VIEWS);
-        x=argx_init(g, 0, so("favorites"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_FAVORITES);
-        x=argx_init(g, 0, so("toplist"), so(""));
-          argx_opt_enum(x, WHVN_SORTING_TOPLIST);
-    x=argx_init(o, 'o', so("order"), so("search: order"));
-      g=argx_opt(x, (int *)&cli.search.order, 0);
-        x=argx_init(g, 0, so("asc"), so(""));
-          argx_opt_enum(x, WHVN_ORDER_ASC);
-        x=argx_init(g, 0, so("desc"), so(""));
-          argx_opt_enum(x, WHVN_ORDER_DESC);
-    x=argx_init(o, 't', so("toplist-range"), so("search: toplist range"));
-      g=argx_opt(x, (int *)&cli.search.toplist_range, 0);
-        x=argx_init(g, 0, so("1d"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1D);
-        x=argx_init(g, 0, so("3d"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_3D);
-        x=argx_init(g, 0, so("1w"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1W);
-        x=argx_init(g, 0, so("1M"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1M);
-        x=argx_init(g, 0, so("3M"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_3M);
-        x=argx_init(g, 0, so("6M"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_6M);
-        x=argx_init(g, 0, so("1y"), so(""));
-          argx_opt_enum(x, WHVN_TOPLIST_RANGE_1Y);
-    x=argx_init(o, 'i', so("page"), so("search: page"));
-      argx_int(x, (int *)&cli.search.page, 0);
-    x=argx_init(o, 'r', so("seed"), so("search: seed"));
-      argx_str(x, &cli.search.seed, 0);
+          argx_type_so(x, &cli.search.query, 0);
+          argx_callback(x, whvn_cli_search, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+        x=argx_opt(g, 0, so("tag-info"), so("get wallpaper tag info"));
+          argx_type_so(x, &cli.query.tag_info, 0);
+          argx_callback(x, whvn_cli_tag_info, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+        x=argx_opt(g, 0, so("user-settings"), so("get user settings"));
+          argx_callback(x, whvn_cli_user_settings, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+        x=argx_opt(g, 0, so("user-collections"), so("get user collections"));
+          argx_callback(x, whvn_cli_user_collections, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+        x=argx_opt(g, 0, so("user-collection"), so("get a user's collection"));
+          argx_type_so(x, &cli.query.user_collection, 0);
+          argx_callback(x, whvn_cli_user_collection, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+          argx_attr_callback_skip_compgen(x, true);
+          argx_hint_text(x, so("user/id"));
 
-    x=argx_init(o, 'R', so("ratios"), so("search: ratios\n"
+    x=argx_opt(o, 'c', so("categories"), so("search: categories"));
+      g=argx_group_flags(x);
+        argx_flag(g, &cli.search.categories.general, 0, so("general"), so(""));
+        argx_flag(g, &cli.search.categories.anime, 0, so("anime"), so(""));
+        argx_flag(g, &cli.search.categories.people, 0, so("people"), so(""));
+    x=argx_opt(o, 'p', so("purity"), so("search: purity"));
+      g=argx_group_flags(x);
+        argx_flag(g, &cli.search.purity.sfw, 0, so("sfw"), so(""));
+        argx_flag(g, &cli.search.purity.sketchy, 0, so("sketchy"), so(""));
+        x=argx_flag(g, &cli.search.purity.nsfw, 0, so("nsfw"), so("requires API key"));
+          argx_callback(x, whvn_cli_check_apikey_present, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
+    x=argx_opt(o, 's', so("sorting"), so("search: sorting"));
+      g=argx_group_enum(x, (int *)&cli.search.sorting, 0);
+        argx_enum_bind(g, WHVN_SORTING_DATE_ADDED, so("date_added"), so(""));
+        argx_enum_bind(g, WHVN_SORTING_RELEVANCE, so("relevance"), so(""));
+        argx_enum_bind(g, WHVN_SORTING_RANDOM, so("random"), so(""));
+        argx_enum_bind(g, WHVN_SORTING_VIEWS, so("views"), so(""));
+        argx_enum_bind(g, WHVN_SORTING_FAVORITES, so("favorites"), so(""));
+        argx_enum_bind(g, WHVN_SORTING_TOPLIST, so("toplist"), so(""));
+    x=argx_opt(o, 'o', so("order"), so("search: order"));
+      g=argx_group_enum(x, (int *)&cli.search.order, 0);
+        argx_enum_bind(g, WHVN_ORDER_ASC, so("asc"), so(""));
+        argx_enum_bind(g, WHVN_ORDER_DESC, so("desc"), so(""));
+    x=argx_opt(o, 't', so("toplist-range"), so("search: toplist range"));
+      g=argx_group_enum(x, (int *)&cli.search.toplist_range, 0);
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_1D, so("1d"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_3D, so("3d"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_1W, so("1w"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_1M, so("1M"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_3M, so("3M"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_6M, so("6M"), so(""));
+        argx_enum_bind(g, WHVN_TOPLIST_RANGE_1Y, so("1y"), so(""));
+    x=argx_opt(o, 'i', so("page"), so("search: page"));
+      argx_type_int(x, (int *)&cli.search.page, 0);
+    x=argx_opt(o, 'r', so("seed"), so("search: seed"));
+      argx_type_so(x, &cli.search.seed, 0);
+
+    x=argx_opt(o, 'R', so("ratios"), so("search: ratios\n"
                 "e.g.: '1920x1080', 'landscape' or 'portrait'"));
-      argx_vstr(x, &cli.vbuf_ratios, 0);
-      argx_type(x, so("ratios"));
-      argx_func(x, 0, &cli_ratio, &cli, false, false);
+      argx_type_array_so(x, &cli.vbuf_ratios, 0);
+      argx_hint_text(x, so("ratios"));
+      argx_callback(x, &cli_ratio, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
 
-    x=argx_init(o, 'A', so("atleast"), so("search: atleast\n"
+    x=argx_opt(o, 'A', so("atleast"), so("search: atleast\n"
                 "e.g.: '1920x1080'"));
-      argx_str(x, &cli.buf_atleast, 0);
-      argx_type(x, so("resolution"));
-      argx_func(x, 0, &cli_atleast, &cli, false, false);
+      argx_type_so(x, &cli.buf_atleast, 0);
+      argx_hint_text(x, so("resolution"));
+      argx_callback(x, &cli_atleast, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
 
-    x=argx_init(o, 'Z', so("resolutions"), so("search: resolutions\n"
+    x=argx_opt(o, 'Z', so("resolutions"), so("search: resolutions\n"
                 "e.g.: '1920x1080'"));
-      argx_vstr(x, &cli.vbuf_resolutions, 0);
-      argx_type(x, so("resolutions"));
-      argx_func(x, 0, &cli_resolution, &cli, false, false);
+      argx_type_array_so(x, &cli.vbuf_resolutions, 0);
+      argx_hint_text(x, so("resolutions"));
+      argx_callback(x, &cli_resolution, &cli, ARGX_PRIORITY_WHEN_ALL_VALID);
 
 #if 0
-    x=argx_init(o, 'C', so("color"), so("search: color"));
+    x=argx_opt(o, 'C', so("color"), so("search: color"));
       g=argx_opt(x, 0, 0);
         x=argx_opt_enum(g, 0, 
 F( "660000", FG3(0x66, 0x00, 0x00))
@@ -494,17 +489,17 @@ F( "ffffff", FG3(0xff, 0xff, 0xff))
 F( "424153", FG3(0x42, 0x41, 0x53))
 #endif
 
-    o=argx_group(arg, so("Environment Variables"), false);
-    x=argx_env(o, so("WHVN_API_KEY"), so("your API key"), true);
-    argx_builtin_env_compgen(o);
-      argx_str(x, &cli.api.key, 0);
+    x=argx_env(arg, so("WHVN_API_KEY"), so("your API key"));
+      argx_attr_hide(x, true);
+    argx_builtin_env_compgen(arg);
+      argx_type_so(x, &cli.api.key, 0);
 
-    o=argx_group(arg, so("Color Adjustments"), true);
-    argx_builtin_opt_rice(o);
+    //o=argx_group(arg, so("Color Adjustments"), true);
+    argx_builtin_rice(arg);
  
 
     bool quit_early = false;
-    TRYC(arg_parse(arg, argc, argv, &quit_early));
+    if(arg_parse(arg, argc, argv, &quit_early)) goto error;
 
 clean:
     whvn_api_search_free(&cli.search);
