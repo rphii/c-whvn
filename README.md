@@ -64,6 +64,7 @@ https://github.com/rphii/c-whvn
 ### ⚙️ example configuration file
 
 ```
+[options]
 action = pretty,browser,wait
 categories = general,anime,people
 sorting = favorites
